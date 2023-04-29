@@ -1,3 +1,5 @@
+## ---- licence
+
 # Program to perform bibliometric analysis
 # Copyright (C) 2022  Rafael Belo Duarte
 # This program is free software: you can redistribute it and/or modify
@@ -12,25 +14,62 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # contact me at rafaelbeloduarte@pm.me
 
+## ---- test
+version
+
+## ---- bib_analysis_results
 library(bibliometrix)
-library(wordcloud2)
-
-# for a shiny UI for bibliometrix package run
-# biblioshiny()
-
-# to have better control of the charts generation we run our on commands
-# they are documented on the bibliometrix manual: https://cran.r-project.org/web/packages/bibliometrix/bibliometrix.pdf
 
 # set working directory
-setwd("~/DriveUEMEncrypt/casa/uem/Doutorado/Revisão/SAF_bibliometric_analysis/bib_analysis_bibliometrix_R")
+setwd("~/DriveUEMEncrypt/casa/uem/Doutorado/Revisão/SAF_bibliometric_analysis/SAF_bib_analysis_bibliometrix_R")
 
-load("complete_dataset_ANDED.RData")
-
+dataset_ANDED <- readRDS("complete_dataset_ANDED.rds")
 results <- biblioAnalysis(dataset_ANDED, sep = ";")
-saveRDS(dataset_ANDED, file = "dataset_ANDED_for_biblioshiny.rds")
-S <- summary(object = results, k = 10, pause = FALSE)
+# saveRDS(dataset_ANDED, file = "dataset_ANDED_for_biblioshiny.rds")
+attributes(results$Documents)
+n_articles <- results$Documents[[1]] + results$Documents[[3]]
+n_proceedings <- results$Documents[[4]] + results$Documents[[10]]
+n_reviews <- results$Documents[[11]] + results$Documents[[12]]
+n_news <- results$Documents[[9]]
+n_editorial <- results$Documents[[6]]
+n_meeting_abs <- results$Documents[[8]]
+n_corrections <- results$Documents[[5]]
+n_data_papers <- results$Documents[[2]]
+n_letters <- results$Documents[[7]]
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+AUperPaper_mode <- Mode(results$nAUperPaper)
 
-# author collaboration network
+## ---- missing_data
+library(knitr)
+library(kableExtra)
+misssing_data <- missingData(dataset_ANDED)
+## ---- missing_data_table
+kable(misssing_data$mandatoryTags,  caption = "Missing data.", booktabs = TRUE,
+      col.names = c("Tag",	"Description",	"Missing Counts",	"Missing %", "Status")) %>%
+  kable_styling(latex_options = "scale_down")
+
+## ---- summary
+S <- summary(object = results, k = 10, pause = FALSE)
+# plots_bib <- plot(x = results, k = 10, pause = FALSE)
+
+## ---- slice_2022
+dataset_ANDED_2022 <- timeslice(dataset_ANDED, breaks = c(2022))
+results_2022 <- biblioAnalysis(dataset_ANDED_2022$`(1994,2022]`, sep = ";")
+S_2022 <- summary(object = results_2022, k = 10, pause = FALSE)
+
+## ---- slice_2012_2022
+dataset_ANDED_2012_2022 <- timeslice(dataset_ANDED, breaks = c(2012,2022))
+results_2012_2022 <- biblioAnalysis(dataset_ANDED_2012_2022$`(2012,2022]`, sep = ";")
+S_2012_2022 <- summary(object = results_2012_2022, k = 10, pause = FALSE)
+
+## ---- bib_analysis_results_before_AND
+dataset_NOT_ANDED <- convert2df("complete_dataset.bib", dbsource = "wos", format = "bibtex")
+results_NOT_ANDED <- biblioAnalysis(dataset_NOT_ANDED, sep = ";")
+
+## ---- author_collaboration_network
 M_AU <- metaTagExtraction(dataset_ANDED, Field = "AU", sep = ";");
 NetMatrix_AU <- biblioNetwork(M_AU, analysis = "collaboration", network = "authors", sep = ";");
 net_AU=networkPlot(NetMatrix_AU,
@@ -52,46 +91,120 @@ net_AU=networkPlot(NetMatrix_AU,
                    alpha = 0.7,
                    halo = FALSE);
 
-# authors keywords co-occurrence network
-removed_terms = c("1",
-                  "article",
-                  )
-synonyms_list=c("kinetics;kinetic study",
+# net2VOSviewer(net_AU);
+
+## ---- filtered_terms
+removed_terms = c("2", "assessment", "use", "analysis", 
+                  "performance", "alternative", "green",
+                  "process", "environmental")
+synonyms_list=c("alternative fuels;alternative fuel;biofuels;
+                bio-fuels;biofuel;bio-fuel;bio-oil;fuels;fuel;
+                advanced biofuels",
+                "saf;sustainable aviation fuel;
+                sustainable aviation fuel (saf);
+                sustainable aviation fuels;bio-jet fuel;
+                jet biofuel;biojet fuel;bio jet fuel;
+                bio-jet fuels;bio jet fuel ;bio-jet;
+                bio-kerosene;biokerosene;
+                aviation biofuel;aviation biofuels;
+                bio-aviation fuel; aviation biofuels ;biojet;
+                alternative jet fuel;alternative jet fuels;
+                renewable jet fuel;renewable aviation fuel;
+                aviation fuels;aviation fuel;jet fuel;
+                aviation fuels;jet;kerosene;jet a-1",
+                "sustainability;sustainable development;
+                sustainable;environmental impact",
+                "emissions;emission;aviation emissions;
+                aircraft emissions;co2 emissions;
+                greenhouse gas;greenhouse gas emissions;
+                ghg;ghg emissions;air pollution;",
+                "diesel;biodiesel;bio-diesel;
+                green diesel;diesel engine",
+                "lca;life cycle assessment;life cycle",
+                "ethanol;bioethanol",
+                "aviation;sustainable aviation;
+                aircraft;air transport",
+                "tec. econ. analysis;
+                techno-economic analysis;techno-economic",
+                "deoxygenation;hydrodeoxygenation",
+                "HTL;hydrothermal liquefaction",
+                "energy;renewable energy;bioenergy",
+                "pyrolysis;fast pyrolysis;
+                catalytic pyrolysis",
+                "catalysis;catalysts;catalyst",
+                "drop-in;drop-in biofuels;drop-in fuel",
+                "hydroprocessing;hydrogenation;
+                hydrocracking;hydrotreating",
+                "isomerization;hydroisomerization",
+                "cellulose;lignocellulose",
+                "efficiency;energy efficiency",
+                "combustion;combustion characteristics"
                 );
+
+## ---- authors_keywords_co-occurrence_network
 NetMatrix_kw <- biblioNetwork(dataset_ANDED, analysis = "co-occurrences",
-                              network = "author_keywords", sep = ";",
-                              synonyms = synonyms_list,
-                              remove.terms = removed_terms);
+                              network = "keywords", sep = ";",
+                              synonyms = NULL,
+                              remove.terms = NULL);
+
+# net2VOSviewer(net_kw);
+
 net_kw=networkPlot(NetMatrix_kw,
                    n = 50,
                    normalize = "association",
                    Title = NULL,
                    type = "auto",
-                   size = 3,
-                   size.cex = FALSE,
+                   size = 10,
+                   size.cex = TRUE,
                    remove.multiple=FALSE,
-                   labelsize= 1,
+                   labelsize= 1.2,
                    label.cex = FALSE,
                    cluster = "walktrap",
                    community.repulsion = 0.05,
                    remove.isolates = TRUE,
-                   edgesize = 10,
-                   alpha = 0.50,
-                   halo = FALSE);
-net2VOSviewer(net_kw);
+                   edgesize = 5,
+                   alpha = 0.70,
+                   halo = FALSE,
+                   curved = TRUE);
 
-# word cloud
+## ---- word_cloud
+library(wordcloud2)
+library(webshot)
+library("htmlwidgets")
+# webshot::install_phantomjs()
+
 Tab <- tableTag(dataset_ANDED, Tag = "DE", sep = ";",
                 synonyms = synonyms_list, remove.terms = removed_terms);
 Tab <- log(Tab);
-wordcloud2(Tab, size = 0.3, minSize = 0, gridSize =  10,
-           fontFamily = 'Liberation Serif', fontWeight = 'bold',
-           color = 'random-dark', backgroundColor = "white",
-           minRotation = -pi/4, maxRotation = pi/4, shuffle = FALSE,
-           rotateRatio = 0, shape = 'circle', ellipticity = 0.8,
-           widgetsize = NULL, figPath = NULL, hoverFunction = NULL);
+wc <- wordcloud2(Tab, size = 0.3, minSize = 0, gridSize =  10,
+                 fontFamily = 'Liberation Serif', fontWeight = 'bold',
+                 color = 'random-dark', backgroundColor = "white",
+                 minRotation = -pi/4, maxRotation = pi/4, shuffle = FALSE,
+                 rotateRatio = 0, shape = 'circle', ellipticity = 0.8,
+                 widgetsize = NULL, figPath = NULL, hoverFunction = NULL);
+Sys.setenv("OPENSSL_CONF"="/dev/null")
+saveWidget(wc, "figure/wc.html"  , selfcontained = F)
+webshot(
+  url = "figure/wc.html",
+  file = "figure/wc.pdf",
+  delay = 5,
+  selector = "#canvas",
+  vwidth = 1920,
+  vheight = 1080
+)
 
-# country collaboration network
+## ---- keyword_growth
+topKW=KeywordGrowth(dataset_ANDED, Tag = "ID", sep = ";", top=10, cdf=TRUE)
+topKW
+# Plotting results
+# install.packages("reshape2")
+library(reshape2)
+library(ggplot2)
+DF=melt(topKW, id='Year')
+localCitations
+ggplot(DF,aes(Year,value, group=variable, color=variable))+geom_line()
+
+## ---- country_collaboration_network
 M_CO <- metaTagExtraction(dataset_ANDED, Field = "AU_CO", sep = ";");
 NetMatrix_CO <- biblioNetwork(M_CO, analysis = "collaboration", network = "countries", sep = ";");
 net_CO=networkPlot(NetMatrix_CO,
@@ -110,8 +223,11 @@ net_CO=networkPlot(NetMatrix_CO,
                 edgesize = 5,
                 alpha = 0.7);
 net2VOSviewer(net_CO);
+## ---- network_statistics
+netstat_countries <- networkStat(NetMatrix_CO, stat = "all", type = "degree")
+summary(netstat_countries)
 
-# collaboration network between institutions
+## ---- collaboration_network_between_institutions
 M_AFF <- metaTagExtraction(dataset_ANDED, Field = "AU1_UN", sep = ";");
 NetMatrix_AFF <- biblioNetwork(M_AFF, analysis = "collaboration", network = "universities", sep = ";");
 net_AFF=networkPlot(NetMatrix_AFF,
@@ -130,15 +246,15 @@ net_AFF=networkPlot(NetMatrix_AFF,
                 edgesize = 20,
                 alpha = 0.7);
 
-# historical citation network
+## ---- historical_citation_network
 histResults <- histNetwork(dataset_ANDED, sep = ";")
 # Plot a historical co-citation network
 net <- histPlot(histResults, size = 10)
 
-# reference publication year spectrocopy
+## ---- reference_publication_year_spectrocopy
 rpys(dataset_ANDED, sep = ";", timespan = c(1950,2022), graph = T)
 
-# historiograph
+## ---- historiograph
 histResults <- histNetwork(dataset_ANDED, min.citations = 1, sep = ";", network = TRUE, verbose = TRUE);
 histPlot(
   histResults,
@@ -149,22 +265,39 @@ histPlot(
   verbose = TRUE
 );
 
-# co-citation analysis
+## ---- co-citation_analysis
 NetMatrix_coc <- biblioNetwork(dataset_ANDED, analysis = "co-citation", network = "references", sep = ";");
 net_coc=networkPlot(NetMatrix_coc, n = 30, Title = "Co-Citation Network", type = "fruchterman", 
                     size=10, size.cex = TRUE,
                 remove.multiple=FALSE, labelsize=0.7,edgesize = 5, label.cex = TRUE, community.repulsion = 0.01);
 
-# bib coupling
+## ---- bib_coupling
 NetMatrix_bib_coup <- biblioNetwork (dataset_ANDED, analysis = "coupling", network = "references", sep = ";");
 net_coc=networkPlot(NetMatrix_bib_coup, n = 50, Title = "Bibliographic coupling", type = "fruchterman", 
                     size=10, size.cex = TRUE,
                     remove.multiple=FALSE, labelsize=2,edgesize = 1, label.cex = TRUE, community.repulsion = 0.01);
 
-# conceptual structure
+## ---- conceptual_structure
 CS <- conceptualStructure(dataset_ANDED, field="DE", method="CA", 
                           stemming=TRUE, minDegree=10, k.max = 5, synonyms = synonyms_list);
 
 years=c(2005,2010,2015)
 nexus <- thematicEvolution(dataset_ANDED,field="DE", years=years, n=100,minFreq=2)
 plotThematicEvolution(nexus$Nodes,nexus$Edges)
+
+## ---- coupling_map
+# It performs a coupling network analysis and plots 
+# community detection results on a bi-dimensional
+# map (Coupling Map).
+res <- couplingMap(dataset_ANDED, analysis = "authors", field = "CR", n = 250, impact.measure="local",
+                   minfreq = 3, size = 0.5, repel = TRUE)
+plot(res$map)
+
+## ---- historical_citation_network
+histResults <- histNetwork(dataset_ANDED, sep = ";")
+# Plot a historical co-citation network
+net <- histPlot(histResults, size = 5)
+
+## ---- conceptual_structure
+CS <- conceptualStructure(dataset_ANDED, field="ID", method="CA",
+                          stemming=FALSE, minDegree=3, k.max = 5)

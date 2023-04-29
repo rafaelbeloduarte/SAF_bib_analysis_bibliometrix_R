@@ -22,8 +22,7 @@ library(refsplitr)
 # biblioshiny()
 
 # set working directory
-setwd("~/DriveUEMEncrypt/casa/uem/Doutorado/Revisão/SAF_bibliometric_analysis/bib_analysis_bibliometrix_R")
-
+setwd("~/DriveUEMEncrypt/casa/uem/Doutorado/Revisão/SAF_bibliometric_analysis/SAF_bib_analysis_bibliometrix_R")
 # import refs
 refs <- references_read(data = "WOS_dataset/txt", 
                         dir=TRUE,
@@ -47,8 +46,8 @@ refs_refined <- authors_refine(refs_clean$review,
 
 write.csv(refs_refined,"complete_dataset_ANDED_refined.csv")
 
-georef <-authors_georef(data=refs_refined, address_column = "address")
+# georef <-authors_georef(data=refs_refined, address_column = "address")
 
 # plot_addresses_country <- plot_addresses_country(georef$addresses)
-plot_addresses_points <- plot_addresses_points(georef$addresses)
+# plot_addresses_points <- plot_addresses_points(georef$addresses)
 # plot_addresses_points

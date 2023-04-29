@@ -1,0 +1,319 @@
+%% 
+%% Copyright 2007-2020 Elsevier Ltd
+%% 
+%% This file is part of the 'Elsarticle Bundle'.
+%% ---------------------------------------------
+%% 
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.2 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.2 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%% 
+%% The list of all files belonging to the 'Elsarticle Bundle' is
+%% given in the file `manifest.txt'.
+%% 
+
+%% Template article for Elsevier's document class `elsarticle'
+%% with numbered style bibliographic references
+%% SP 2008/03/01
+%%
+%% 
+%%
+%% $Id: elsarticle-template-num.tex 190 2020-11-23 11:12:32Z rishi $
+%%
+%%
+\documentclass[preprint,10pt]{elsarticle}
+
+%% Use the option review to obtain double line spacing
+%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+%% For including figures, graphicx.sty has been loaded in
+%% elsarticle.cls. If you prefer to use the old commands
+%% please give \usepackage{epsfig}
+
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+\usepackage{natbib}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{url}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{siunitx}
+\usepackage[nointegrals]{wasysym}
+\usepackage{cancel}
+% for writing reactions under a separated 
+% numbering scheme from equation environment
+\usepackage[version=4]{mhchem}
+\usepackage{chemmacros}
+\renewcommand\reactionautorefname{Reaction}
+\chemsetup{
+	formula=mhchem,
+	reactions/tag-open=(R,
+	reactions/tag-close=),
+}
+\usepackage{booktabs}
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+\usepackage{lineno}
+
+\journal{Fuel}
+
+\begin{document}
+% \SweaveOpts{concordance=TRUE}
+
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+%% use the tnoteref command within \title for footnotes;
+%% use the tnotetext command for theassociated footnote;
+%% use the fnref command within \author or \address for footnotes;
+%% use the fntext command for theassociated footnote;
+%% use the corref command within \author for corresponding author footnotes;
+%% use the cortext command for theassociated footnote;
+%% use the ead command for the email address,
+%% and the form \ead[url] for the home page:
+%% \title{Title\tnoteref{label1}}
+%% \tnotetext[label1]{}
+%% \author{Name\corref{cor1}\fnref{label2}}
+%% \ead{email address}
+%% \ead[url]{home page}
+%% \fntext[label2]{}
+%% \cortext[cor1]{}
+%% \affiliation{organization={},
+%%             addressline={},
+%%             city={},
+%%             postcode={},
+%%             state={},
+%%             country={}}
+%% \fntext[label3]{}
+
+\title{Sustainable aviation fuel research bibliometric analysis: patterns and trends}
+
+%% use optional labels to link authors explicitly to addresses:
+%% \author[label1,label2]{}
+%% \affiliation[label1]{organization={},
+%%             addressline={},
+%%             city={},
+%%             postcode={},
+%%             state={},
+%%             country={}}
+%%
+%% \affiliation[label2]{organization={},
+%%             addressline={},
+%%             city={},
+%%             postcode={},
+%%             state={},
+%%             country={}}
+
+\author[label1]{Rafael Belo Duarte\corref{cor1}}
+\ead{duarterafaelbelo@gmail.com}
+% \author[label2]{João da Silva}
+\author[label1]{João Lourenço Castagnari Willimann Pimenta}
+\author[label1]{Luiz Mario de Matos Jorge}
+
+\affiliation[label1]{organization={Department of Chemical Engineering, Maringa State University},%Department and Organization
+            addressline={Av. Colombo, 5790}, 
+            city={Maringa},
+            postcode={87020-900}, 
+            state={Parana},
+            country={Brazil}}
+        
+% \affiliation[label2]{organization={Department of Chemical Engineering, Federal University of Parana},%Department and Organization
+%	addressline={R. Francisco H. dos Santos}, 
+%	city={Curitiba},
+%	postcode={81531-990}, 
+%	state={Parana},
+%	country={Brazil}}
+
+\cortext[cor1]{Corresponding author at: Department of Chemical Engineering, Universidade Estadual de Maringa, UEM, Av. Colombo, 5790 – Zona 7, Maringa, PR 87020-900, Brazil}
+
+\begin{abstract}
+%% Text of abstract
+\begin{linenumbers}
+\end{linenumbers}
+\end{abstract}
+
+<<echo=FALSE,cache=FALSE>>=
+library(knitr)
+options(digits=1)
+knitr::opts_chunk$set(echo=FALSE, cache=TRUE, digits = 2, tidy=TRUE, tidy.opts=list(width.cutoff=50))
+knitr::read_chunk('bib_analysis.R')
+@
+
+<<licence, echo=TRUE>>=
+@
+
+<<create_word_cloud, include=FALSE>>=
+<<bib_analysis_results>>
+<<filtered_terms>>
+<<word_cloud>>
+@
+
+%%Graphical abstract
+\begin{graphicalabstract}
+\includegraphics[width=\linewidth]{figure/wc}
+\end{graphicalabstract}
+
+%%Research highlights
+\begin{highlights}
+\item Highlight 2
+\item Highlight 2
+\end{highlights}
+
+\begin{keyword}
+%% keywords here, in the form: keyword \sep keyword
+saf \sep bibliometric analysis
+
+%% PACS codes here, in the form: \PACS code \sep code
+
+%% MSC codes here, in the form: \MSC code \sep code
+%% or \MSC[2008] code \sep code (2000 is the default)
+
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+%% main text
+\section{Introduction}
+\label{introduction}
+
+\section{Methods}
+\label{methods}
+
+The complete dataset regarding Sustainable Aviation Fuels were collected from the Web of Science platform using the query “sustainable aviation fuel OR aviation biofuel OR aviation bio fuel OR bio-jet fuel OR bio jet fuel OR bio-aviation fuel OR bio aviation fuel (Topic)”. No time span restriction was set; this was done to get the whole historical timeline of this field.
+
+\subsection{Author name disambiguation}
+\label{method_AND}
+
+In order to have a more accurate author count as well as better collaboration networks, it is necessary to perform author name disambiguation, in other words, to identify authors that written their names in different ways (synonyms) and different authors with the same name (homonyms). The R package “refsplitr” by ref. \cite{fournier_refsplitr_2020} was used for this purpose via \href{https://raw.githubusercontent.com/rafaelbeloduarte/SAF_bib_analysis_bibliometrix_R/main/AND.R?token=GHSAT0AAAAAACADU5B5CVPUFHTQXIGZTYEEZCLCDKA}{Script 1}. This script generates a list of authors synonims and homonyms which was fed into \href{https://raw.githubusercontent.com/rafaelbeloduarte/SAF_bib_analysis_bibliometrix_R/main/recreate_ANDED_DB.py?token=GHSAT0AAAAAACADU5B53DT6XCVHUJBJNXISZCLCD3A}{Script 2}, written in python to replace the names on the WOS dataset. The "refsplitr" package only supports disambiguation of WOS database, this is why this WOS was selected instead of other citation databases, like Scopus.
+
+\subsection{Visualization of bibliographic networks}
+\label{method_network_visualization}
+
+For keywords visualization:
+Author’s keywords is more fragmented compared to Web of Science Keywords Plus, which is extracted from titles.
+
+\section{Results}
+\label{results}
+
+\subsection{Overview}
+\label{overview}
+
+The query returned \Sexpr{sum(results$Documents)} documents on april 26, 2023, of which \Sexpr{n_articles} are articles, \Sexpr{n_proceedings} proceedings papers and \Sexpr{n_reviews} reviews, the remaining \Sexpr{sum(results$Documents) - (n_articles + n_proceedings + n_reviews)} documents are news items (\Sexpr{n_news}), editorial material (\Sexpr{n_editorial}), meeting abstracts (\Sexpr{n_meeting_abs}), corrections (\Sexpr{n_corrections}) data papers (\Sexpr{n_data_papers}) and a letter (\Sexpr{n_letters}). Most of the research is collaborative, only \Sexpr{results$AuSingleAuthoredArt} documents have a single author, the average number of authors per document is \num{\Sexpr{mean(results$nAUperPaper)}} and the most common is \Sexpr{AUperPaper_mode}, distributed as in \autoref{fig:AUperPaper_hustogram}. There is also a a high number of international collaborations: \num{\Sexpr{results$IntColl}}\% of total publications.
+
+\begin{figure}
+<<AUperPaper_histogram, out.width="80%", fig.align='center'>>=
+h <- hist(results$nAUperPaper, plot = FALSE)
+plot(h, main = NULL, xlab = "Authors per Paper", labels = T, ylim =c(0,1.2*max(h$counts)))
+@
+	\caption{Histogram of authors per paper.}
+	\label{fig:AUperPaper_hustogram}
+\end{figure}
+
+<<eval_missing_data>>=
+<<missing_data>>
+@
+
+Regarding the quality of the data, Table \ref{tab:missing_data} shows that most of the metadata is complete. Notable exceptions are \Sexpr{misssing_data$mandatoryTags[15,'missing_pct']}\% of author’s keywords (DE), \Sexpr{misssing_data$mandatoryTags[14,'missing_pct']}\% of Web of Science Keywords Plus (ID) and all of Web of Science Categories, not included in the dataset.
+
+\label{tab:missing_data}
+<<show_missing_data_table>>=
+<<missing_data_table>>
+@
+
+<<run_summary, include=FALSE>>=
+<<summary>>
+@
+
+<<run_slice_2022, include=FALSE>>=
+<<slice_2022>>
+@
+
+<<run_slice_2012_2022, include=FALSE>>=
+<<slice_2012_2022>>
+@
+
+The total time span found in the Web of Science platform for SAF production ranges from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to current year (\Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}), as research on sustainable industries increased on these past two decades. \autoref{fig:annual_scient_prod} shows the annual scientific production on SAF from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to \Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}, the average annual growth rate from \Sexpr{S_2022$AnnualProduction$`Year   `[[1]]} to \Sexpr{S_2022$AnnualProduction$`Year   `[[length(S_2022$AnnualProduction$`Year   `)]]} is \Sexpr{S_2022$AnnualGrowthRate}\%, and \Sexpr{S_2012_2022$AnnualGrowthRate}\% from 2012 to 2022. Until around 2007 there was little interest on SAF research, as can ben seen in \autoref{fig:annual_scient_prod}.
+
+\begin{figure}
+<<plot_annual_scient_prod, results='hide', out.width="80%", fig.align='center'>>=
+plot(S_2022$AnnualProduction, type = "l", lty = 0)
+lines(S_2022$AnnualProduction, type = "l", lty = 1)
+@
+	\caption{SAF research annual production numbers from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to \Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}.}
+	\label{fig:annual_scient_prod}
+\end{figure}
+
+<<run_bib_analysis_results_before_AND, results='hide'>>=
+<<bib_analysis_results_before_AND>>
+@
+
+Total author count is \Sexpr{results$nAuthors}, before author name disambiguation this number was \Sexpr{results_NOT_ANDED$nAuthors}.
+
+\subsection{Textual analysis}
+\label{textual_analysis}
+
+A list of synonyms was created based on the visualization of authors keywords network. Some common strings that carrie little information were also removed ("2", "assessment", "use", "analysis", "performance", "alternative", "green", "process", "environmental"). Equivalent and similar keywords were grouped together in a list. Some assumptions were made to group similar terms, in order to extract more information:
+
+\begin{itemize}
+  \item The terms “sustainable” and “aviation fuels” were grouped into “saf”, due to a very high connection;
+\end{itemize}
+
+\begin{figure}
+<<show_keyword_network, results='hide', out.width="100%", fig.align='center'>>=
+<<authors_keywords_co-occurrence_network>>
+@
+	\caption{Keyword network.}
+	\label{fig:keyword_network}
+\end{figure}
+
+%% The Appendices part is started with the command \appendix;
+%% appendix sections are then done as normal sections
+%% \appendix
+
+%% \section{}
+%% \label{}
+
+%% If you have bibdatabase file and want bibtex to generate the
+%% bibitems, please use
+%%
+\bibliographystyle{elsarticle-num} 
+\bibliography{bibliography.bib}
+
+%% else use the following coding to input the bibitems directly in the
+%% TeX file.
+
+% \begin{thebibliography}{00}
+
+%% \bibitem{label}
+%% Text of bibliographic item
+
+% \bibitem{}
+
+% \end{thebibliography}
+\end{document}
+\endinput
+%%
+%% End of file `elsarticle-template-num.tex'.

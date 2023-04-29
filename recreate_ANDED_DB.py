@@ -1,51 +1,76 @@
+# Program to insert an ANDed list created by refsplitr
+# into a rds bibliometrix file
+# Copyright (C) 2023  Rafael Belo Duarte
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# contact me at rafaelbeloduarte@pm.me
+
 import pyreadr
 import csv
 import difflib
 
-def similar(seq1, seq2, conf):
-    return difflib.SequenceMatcher(a=seq1.lower(), b=seq2.lower()).ratio() > conf
-
 # load AND database
 AND_DB = []
-ID_list = []
-with open('AND_refined.csv', newline='') as csvfile:
-	AND_data = csv.reader(csvfile, delimiter=',', quotechar='"')
-	for row in AND_data:
-		# row[0] = row[0].replace(".", "")
-		AND_DB.append(row)
-		ID_list.append(row[3] + row[5] + row[6] + row[7] + row[14])
+with open('complete_dataset_ANDED_refined.csv', newline='') as csvfile:
+    AND_data = csv.reader(csvfile, delimiter=',', quotechar='"')
+    for row in AND_data:
+        AND_DB.append(row)
 
-# load WOS dataset (converted to RData in R)
+# load WOS dataset (converted to RData in R first)
 # result is a dictionary where keys are the name of objects and the values python
 # objects
 result = pyreadr.read_r('complete_dataset.RData') # also works for Rds
 M = result["M"] # extract the pandas data frame for object M
 
-# replace names
+# refsplitr gives a list with papers WOS codes and the respective author orders
+# so it is easy to look through the original dataset, which also has WOS codes,
+# and replace all the names
+
+# removing the ":" characther from AND_DB first because
+# in the original database there is no ":"
+AND_wos_codes = []
+for j in range(len(AND_DB)):
+    AND_wos_codes.append(AND_DB[j][15].replace(":",""))
+
+# AND index:
+# ['', 'authorID', 'groupID', 'author_name', 'author_order', 'address', 'university', 'department', 'postal_code', 'city', 'state', 'country', 'RP_address', 'RI', 'OI', 'UT', 'refID', 'PT', 'PY', 'PU']
+# loop to replace names
 a = 1
 for i in range(len(M)):
-	
-	# split authors in each line
-	authors_tmp = []
-	
-	authors_tmp = M.AU[i]
-	
-	authors_tmp = authors_tmp.split(";")
-	
-	# loop trhough all authors replacing names
-	for j in range(len(authors_tmp)):
-		# AND index
-		# ['', 'authorID', 'groupID', 'author_name', 'author_order', 'address', 'university', 'department', 'postal_code', 'city', 'state', 'country', 'RP_address', 'RI', 'OI', 'UT', 'refID', 'PT', 'PY', 'PU']
-		for k in range(len(AND_DB)):
-			AND_wos_code = AND_DB[k][15].replace(":","")
-			# if name strings are 50% similar and WOS code is equal then name is replaced
-			if similar(AND_DB[k][3],authors_tmp[j], 0.5) and AND_wos_code == M.UT[i]:
-				M.AU[i] = M.AU[i].replace(authors_tmp[j],AND_DB[k][3] + " " + AND_DB[k][2])
-				print(AND_DB[k][3] + " " + AND_DB[k][2], " = ", authors_tmp[j])
-				print(AND_DB[k][15], " = ", M.UT[i])
-				print("")
-				a = a + 1
-				print(a)
+    original_DB_wos_code = M.UT[i]
+    print("WOS code: ", original_DB_wos_code)
+    print("Original names: ", M.AU[i])
 
-# write the new R dataframe
-pyreadr.write_rdata("complete_dataset_ANDED.rds", M, df_name="dataset_ANDED")
+    indices = [index for index, item in enumerate(AND_wos_codes) if item == original_DB_wos_code]
+
+    authors_tmp = []
+    
+    for k in indices:
+        # create a list of lists with author orders and names
+        authors_tmp.append([AND_DB[k][4],AND_DB[k][3]])
+    # sort the list
+    authors_tmp.sort()
+    
+    # remove the order information from the list
+    authors = []
+    for i in range(len(authors_tmp)):
+        authors.append(authors_tmp[i][1])
+
+    # convert list back into str
+    authors = ';'.join(str(x) for x in authors)
+
+    M.AU[i] = authors
+
+    print("New names: ", M.AU[i])
+    print("")
+
+# save the new bibliometrix rds file
+pyreadr.write_rds("complete_dataset_ANDED.rds", M)
