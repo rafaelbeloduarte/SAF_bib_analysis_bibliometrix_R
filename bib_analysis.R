@@ -14,9 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # contact me at rafaelbeloduarte@pm.me
 
-## ---- test
-version
-
 ## ---- bib_analysis_results
 library(bibliometrix)
 
@@ -53,7 +50,27 @@ kable(misssing_data$mandatoryTags,  caption = "Missing data.", booktabs = TRUE,
 
 ## ---- summary
 S <- summary(object = results, k = 10, pause = FALSE)
-# plots_bib <- plot(x = results, k = 10, pause = FALSE)
+
+## ---- plot_summary
+plots_bib <- plot(x = results, k = 10, pause = FALSE)
+
+## ---- barplot_most_prod_countries
+par(mar=c(5,10,1,1))
+barplot(as.numeric(S$MostProdCountries$Articles), names.arg = S$MostProdCountries$Country, horiz = TRUE, las = 1, xlab = "Number of publications.")
+
+## ---- plot_int_collab
+par(mar=c(5,10,1,1))
+barplot(as.numeric(S$MostProdCountries$MCP_Ratio), names.arg = S$MostProdCountries$Country, horiz = TRUE, las = 1, xlab = "Multiple to single country publication ratio.")
+
+## ---- main_info_table
+library(knitr)
+library(kableExtra)
+kable(S$MainInformationDF,  format = "latex", caption = "Main information.", booktabs = TRUE) %>%
+  kable_styling(latex_options = "scale_down")
+
+## ---- most_prod_authors
+kable(S$MostProdAuthors,  format = "latex", caption = "Main information.", booktabs = TRUE) %>%
+  kable_styling(latex_options = "scale_down")
 
 ## ---- slice_2022
 dataset_ANDED_2022 <- timeslice(dataset_ANDED, breaks = c(2022))
@@ -81,7 +98,7 @@ net_AU=networkPlot(NetMatrix_AU,
                    size.cex = TRUE,
                    remove.multiple=FALSE,
                    label = TRUE,
-                   labelsize= 2,
+                   labelsize = 2,
                    label.color = TRUE,
                    cluster = "edge_betweenness",
                    community.repulsion = 0.0001,
@@ -97,7 +114,7 @@ net_AU=networkPlot(NetMatrix_AU,
 removed_terms = c("2", "assessment", "use", "analysis", 
                   "performance", "alternative", "green",
                   "process", "environmental")
-synonyms_list=c("alternative fuels;alternative fuel;biofuels;
+synonyms_list=c("a.f.;alternative fuels;alternative fuel;biofuels;
                 bio-fuels;biofuel;bio-fuel;bio-oil;fuels;fuel;
                 advanced biofuels",
                 "saf;sustainable aviation fuel;
@@ -120,7 +137,7 @@ synonyms_list=c("alternative fuels;alternative fuel;biofuels;
                 ghg;ghg emissions;air pollution;",
                 "diesel;biodiesel;bio-diesel;
                 green diesel;diesel engine",
-                "lca;life cycle assessment;life cycle",
+                "lca;life cycle assessment;life-cycle assessment;life cycle",
                 "ethanol;bioethanol",
                 "aviation;sustainable aviation;
                 aircraft;air transport",
@@ -138,55 +155,99 @@ synonyms_list=c("alternative fuels;alternative fuel;biofuels;
                 "isomerization;hydroisomerization",
                 "cellulose;lignocellulose",
                 "efficiency;energy efficiency",
-                "combustion;combustion characteristics"
+                "combustion;combustion characteristics",
+                "fts;fischer-tropsch"
                 );
+
+## ---- titles_keywords_co-occurrence_network
+title_terms <- termExtraction(
+                dataset_ANDED,
+                Field = "TI",
+                ngrams = 1,
+                stemming = FALSE,
+                language = "english",
+                remove.numbers = TRUE,
+                remove.terms = removed_terms,
+                keep.terms = NULL,
+                synonyms = synonyms_list,
+                verbose = TRUE
+)
+NetMatrix_TI <- biblioNetwork(title_terms, analysis = "co-occurrences",
+                              network = "titles", sep = ";",
+                              synonyms = synonyms_list,
+                              remove.terms = removed_terms);
+
+# net2VOSviewer(net_kw);
+par(mar=c(0,0,0,0))
+net_kw=networkPlot(NetMatrix_TI,
+                   n = 50,
+                   normalize = "association",
+                   Title = NULL,
+                   type = "fruchterman",
+                   size = 15,
+                   size.cex = TRUE,
+                   remove.multiple=TRUE,
+                   labelsize = 3,
+                   label.cex = TRUE,
+                   cluster = "walktrap",
+                   community.repulsion = 0.1,
+                   remove.isolates = TRUE,
+                   noloops = TRUE,
+                   edgesize = 0.5,
+                   edges.min = 20,
+                   alpha = 1,
+                   halo = FALSE,
+                   curved = FALSE);
 
 ## ---- authors_keywords_co-occurrence_network
 NetMatrix_kw <- biblioNetwork(dataset_ANDED, analysis = "co-occurrences",
-                              network = "keywords", sep = ";",
-                              synonyms = NULL,
-                              remove.terms = NULL);
+                              network = "author_keywords", sep = ";",
+                              synonyms = synonyms_list,
+                              remove.terms = removed_terms);
 
 # net2VOSviewer(net_kw);
-
+par(mar=c(0,0,0,0))
 net_kw=networkPlot(NetMatrix_kw,
                    n = 50,
                    normalize = "association",
                    Title = NULL,
-                   type = "auto",
+                   type = "fruchterman",
                    size = 10,
                    size.cex = TRUE,
-                   remove.multiple=FALSE,
-                   labelsize= 1.2,
-                   label.cex = FALSE,
+                   remove.multiple=TRUE,
+                   labelsize = 3,
+                   label.cex = TRUE,
+                   label.color = TRUE,
                    cluster = "walktrap",
                    community.repulsion = 0.05,
                    remove.isolates = TRUE,
-                   edgesize = 5,
-                   alpha = 0.70,
+                   noloops = TRUE,
+                   edgesize = 0.5,
+                   edges.min = 2,
+                   alpha = 1,
                    halo = FALSE,
-                   curved = TRUE);
+                   curved = FALSE);
 
 ## ---- word_cloud
 library(wordcloud2)
-library(webshot)
+library(webshot2)
 library("htmlwidgets")
 # webshot::install_phantomjs()
 
-Tab <- tableTag(dataset_ANDED, Tag = "DE", sep = ";",
+Tab <- tableTag(dataset_ANDED, Tag = "TI", sep = ";",
                 synonyms = synonyms_list, remove.terms = removed_terms);
 Tab <- log(Tab);
-wc <- wordcloud2(Tab, size = 0.3, minSize = 0, gridSize =  10,
-                 fontFamily = 'Liberation Serif', fontWeight = 'bold',
-                 color = 'random-dark', backgroundColor = "white",
-                 minRotation = -pi/4, maxRotation = pi/4, shuffle = FALSE,
-                 rotateRatio = 0, shape = 'circle', ellipticity = 0.8,
-                 widgetsize = NULL, figPath = NULL, hoverFunction = NULL);
+wc <- wordcloud2(Tab, size = 1, minSize = 0, gridSize =  10,
+                   fontFamily = 'Liberation Serif', fontWeight = 'bold',
+                   color = 'random-dark', backgroundColor = "white",
+                   minRotation = -pi/4, maxRotation = pi/4, shuffle = FALSE,
+                   rotateRatio = 0, shape = 'circle', ellipticity = 0.8,
+                   widgetsize = NULL, figPath = NULL, hoverFunction = NULL);
 Sys.setenv("OPENSSL_CONF"="/dev/null")
 saveWidget(wc, "figure/wc.html"  , selfcontained = F)
 webshot(
   url = "figure/wc.html",
-  file = "figure/wc.pdf",
+  file = "figure/wc.png",
   delay = 5,
   selector = "#canvas",
   vwidth = 1920,
@@ -207,25 +268,89 @@ ggplot(DF,aes(Year,value, group=variable, color=variable))+geom_line()
 ## ---- country_collaboration_network
 M_CO <- metaTagExtraction(dataset_ANDED, Field = "AU_CO", sep = ";");
 NetMatrix_CO <- biblioNetwork(M_CO, analysis = "collaboration", network = "countries", sep = ";");
+par(mar=c(0,0,0,0))
 net_CO=networkPlot(NetMatrix_CO,
-                n = dim(NetMatrix_CO)[1],
+                n = 30,
                 normalize = "association",
                 Title = NULL,
                 type = "fruchterman",
-                size = 2,
+                size = 10,
                 size.cex = TRUE,
                 remove.multiple=FALSE,
-                labelsize=2,
+                labelsize = 3,
                 cluster = "edge_betweenness",
-                community.repulsion = 0.01,
+                community.repulsion = 0.05,
                 label.cex = TRUE,
                 remove.isolates = TRUE,
                 edgesize = 5,
-                alpha = 0.7);
-net2VOSviewer(net_CO);
-## ---- network_statistics
+                edges.min = 5,
+                alpha = 1,
+                curved = FALSE);
+# net2VOSviewer(net_CO);
+
+## ---- country_collaboration_network_interactive
+# thanks to massimoaria for sharing the igraph2Vis function:
+# https://github.com/massimoaria/bibliometrix/issues/69
+library(visNetwork)
+igraph2vis<-function(g,curved,labelsize,opacity,type,shape){
+  LABEL <- igraph::V(g)$name
+  LABEL[igraph::V(g)$labelsize==0] <- ""
+  vn <- toVisNetworkData(g)
+  
+  vn$nodes$label <- LABEL
+  vn$edges$num <- 1
+  vn$edges$dashes <- FALSE
+  vn$edges$dashes[vn$edges$lty==2] <- TRUE
+  
+  ## opacity
+  vn$nodes$color <- adjustcolor(vn$nodes$color,alpha=min(c(opacity+0.2,1)))
+  vn$edges$color <- adjustcolor(vn$edges$color,alpha=opacity)
+  
+  ## removing multiple edges
+  vn$edges <- unique(vn$edges)
+  
+  ## labelsize
+  scalemin <- 20
+  scalemax <- 150
+  Min <- min(vn$nodes$font.size)
+  Max <- max(vn$nodes$font.size)
+  if (Max>Min){
+    size <- (vn$nodes$font.size-Min)/(Max-Min)*10*labelsize+10
+  } else {size <- 10*labelsize}
+  size[size<scalemin] <- scalemin
+  size[size>scalemax] <- scalemax
+  vn$nodes$font.size <- size
+  l <- type
+  
+  ### TO ADD SHAPE AND FONT COLOR OPTIONS
+  
+  VIS <- visNetwork(nodes = vn$nodes, edges = vn$edges, type="full", smooth=TRUE, physics=FALSE) %>%
+    visNodes(shape=shape, font=list(color="black")) %>%
+    visIgraphLayout(layout = l) %>%
+    visEdges(smooth = curved) %>%
+    visOptions(highlightNearest =list(enabled = T, hover = T, degree=1), nodesIdSelection = T) %>%
+    visInteraction(dragNodes = TRUE, navigationButtons = TRUE, hideEdgesOnDrag = TRUE)
+  return(list(VIS=VIS,vn=vn, type=type, l=l, curved=curved))
+  
+}
+country_net_igraph <- igraph2vis(net_CO$graph, curved = TRUE, labelsize = 5, opacity = 0.6, type = "layout_with_fr", shape = "circle")
+Sys.setenv("OPENSSL_CONF"="/dev/null")
+library(webshot2)
+library("htmlwidgets")
+saveWidget(country_net_igraph$VIS, "figure/country_net_igraph.html"  , selfcontained = F)
+webshot(
+  url = "figure/country_net_igraph.html",
+  file = "figure/country_net_igraph.png",
+  delay = 5,
+  selector = "#maindivhtmlwidget-3ce7d6739b972c49d361",
+  vwidth = 4000,
+  vheight = 2000)
+
+## ---- countries_network_statistics
 netstat_countries <- networkStat(NetMatrix_CO, stat = "all", type = "degree")
 summary(netstat_countries)
+kable(summary(netstat_countries),  caption = "Countries network statistics.", booktabs = TRUE) %>%
+  kable_styling(latex_options = "scale_down")
 
 ## ---- collaboration_network_between_institutions
 M_AFF <- metaTagExtraction(dataset_ANDED, Field = "AU1_UN", sep = ";");
@@ -252,7 +377,15 @@ histResults <- histNetwork(dataset_ANDED, sep = ";")
 net <- histPlot(histResults, size = 10)
 
 ## ---- reference_publication_year_spectrocopy
-rpys(dataset_ANDED, sep = ";", timespan = c(1950,2022), graph = T)
+ref_spec <- rpys(dataset_ANDED, sep = ";", timespan = c(1990,2022), graph = FALSE)
+plot(ref_spec$rpysTable$Year,ref_spec$rpysTable$Citations, type = "l", lty = 0, xlab = "Year", ylab = "Citations")
+lines(ref_spec$rpysTable$Year,ref_spec$rpysTable$Citations, type = "l", lty = 2)
+lines(ref_spec$rpysTable$Year,ref_spec$rpysTable$diffMedian5, type = "o", lty = 1)
+grid(nx = NULL, ny = NULL,
+     lty = 1,      # Grid line type
+     col = "gray", # Grid line color
+     lwd = 1)      # Grid line width
+legend(ref_spec$rpysTable$Year[[1]], y = max(ref_spec$rpysTable$Citations), c("Number of cited references", "Deviation from the 5 year median"), lty = c(2,1), bg = "white")
 
 ## ---- historiograph
 histResults <- histNetwork(dataset_ANDED, min.citations = 1, sep = ";", network = TRUE, verbose = TRUE);
@@ -269,7 +402,7 @@ histPlot(
 NetMatrix_coc <- biblioNetwork(dataset_ANDED, analysis = "co-citation", network = "references", sep = ";");
 net_coc=networkPlot(NetMatrix_coc, n = 30, Title = "Co-Citation Network", type = "fruchterman", 
                     size=10, size.cex = TRUE,
-                remove.multiple=FALSE, labelsize=0.7,edgesize = 5, label.cex = TRUE, community.repulsion = 0.01);
+                remove.multiple=FALSE, labelsize=2,edgesize = 5, label.cex = TRUE, community.repulsion = 0.01);
 
 ## ---- bib_coupling
 NetMatrix_bib_coup <- biblioNetwork (dataset_ANDED, analysis = "coupling", network = "references", sep = ";");
@@ -294,10 +427,10 @@ res <- couplingMap(dataset_ANDED, analysis = "authors", field = "CR", n = 250, i
 plot(res$map)
 
 ## ---- historical_citation_network
-histResults <- histNetwork(dataset_ANDED, sep = ";")
+histResults <- histNetwork(dataset_ANDED, sep = ";", network = TRUE)
 # Plot a historical co-citation network
 net <- histPlot(histResults, size = 5)
 
 ## ---- conceptual_structure
 CS <- conceptualStructure(dataset_ANDED, field="ID", method="CA",
-                          stemming=FALSE, minDegree=3, k.max = 5)
+                          stemming=FALSE, minDegree=10, k.max = 5)

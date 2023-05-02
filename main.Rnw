@@ -24,10 +24,10 @@
 %% $Id: elsarticle-template-num.tex 190 2020-11-23 11:12:32Z rishi $
 %%
 %%
-\documentclass[preprint,10pt]{elsarticle}
+%% \documentclass[preprint,10pt]{elsarticle}
 
 %% Use the option review to obtain double line spacing
-%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+%% \documentclass[preprint,review,12pt]{elsarticle}
 
 %% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
 %% for a journal layout:
@@ -36,7 +36,7 @@
 %% \documentclass[final,3p,times]{elsarticle}
 %% \documentclass[final,3p,times,twocolumn]{elsarticle}
 %% \documentclass[final,5p,times]{elsarticle}
-%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+\documentclass[final,5p,times,twocolumn]{elsarticle}
 
 %% For including figures, graphicx.sty has been loaded in
 %% elsarticle.cls. If you prefer to use the old commands
@@ -69,6 +69,7 @@
 \usepackage{chngcntr}
 \counterwithin{figure}{section}
 \counterwithin{table}{section}
+\usepackage{float}
 
 %% The lineno packages adds line numbers. Start line numbering with
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
@@ -156,14 +157,11 @@
 <<echo=FALSE,cache=FALSE>>=
 library(knitr)
 options(digits=1)
-knitr::opts_chunk$set(echo=FALSE, cache=TRUE, digits = 2, tidy=TRUE, tidy.opts=list(width.cutoff=50))
+knitr::opts_chunk$set(echo=FALSE, cache=TRUE, digits = 2, tidy=TRUE, tidy.opts=list(width.cutoff=20))
 knitr::read_chunk('bib_analysis.R')
 @
 
-<<licence, echo=TRUE>>=
-@
-
-<<create_word_cloud, include=FALSE>>=
+<<create_word_cloud, include=FALSE, results='hide'>>=
 <<bib_analysis_results>>
 <<filtered_terms>>
 <<word_cloud>>
@@ -171,7 +169,7 @@ knitr::read_chunk('bib_analysis.R')
 
 %%Graphical abstract
 \begin{graphicalabstract}
-\includegraphics[width=\linewidth]{figure/wc}
+\includegraphics[width=\linewidth]{figure/wc.png}
 \end{graphicalabstract}
 
 %%Research highlights
@@ -215,16 +213,40 @@ In order to have a more accurate author count as well as better collaboration ne
 For keywords visualization:
 Author’s keywords is more fragmented compared to Web of Science Keywords Plus, which is extracted from titles.
 
+\subsubsection{Titles}
+\label{method_titles_textual_analysis}
+
+For the generation of titles terms co-occurance network, the 'termExtraction' function from 'bibliometrix' were used to extract unigrams from titles, which was then used to generate a co-occurance network with filterd terms. The network was plotted using the Fruchterman-Reingold \cite{fruchterman_graph_1991} layout. Remaining parameters are provided below.
+
+<<title_network_code, echo=TRUE, eval=FALSE>>=
+<<titles_keywords_co-occurrence_network>>
+@
+
+The filtered terms are comprised of a list of synonyms  created based on repeated visualizations the network, manually grouping terms on each run. Some common strings that carry little information were also removed ("2", "assessment", "use", "analysis", "performance", "alternative", "green", "process", "environmental"). Some assumptions were made to group the similar terms, in order to extract more information:
+
+\begin{itemize}
+  \item The terms “sustainable” and “aviation fuels” were grouped into “saf”, due to a very high connection;
+\end{itemize}
+
 \section{Results}
 \label{results}
 
 \subsection{Overview}
 \label{overview}
 
-The query returned \Sexpr{sum(results$Documents)} documents on april 26, 2023, of which \Sexpr{n_articles} are articles, \Sexpr{n_proceedings} proceedings papers and \Sexpr{n_reviews} reviews, the remaining \Sexpr{sum(results$Documents) - (n_articles + n_proceedings + n_reviews)} documents are news items (\Sexpr{n_news}), editorial material (\Sexpr{n_editorial}), meeting abstracts (\Sexpr{n_meeting_abs}), corrections (\Sexpr{n_corrections}) data papers (\Sexpr{n_data_papers}) and a letter (\Sexpr{n_letters}). Most of the research is collaborative, only \Sexpr{results$AuSingleAuthoredArt} documents have a single author, the average number of authors per document is \num{\Sexpr{mean(results$nAUperPaper)}} and the most common is \Sexpr{AUperPaper_mode}, distributed as in \autoref{fig:AUperPaper_hustogram}. There is also a a high number of international collaborations: \num{\Sexpr{results$IntColl}}\% of total publications.
+Table \ref{tab:main_info} shows the main information about the data. The query returned \Sexpr{sum(results$Documents)} documents from \Sexpr{length(results$Sources)} different sources on april 26, 2023, of which \Sexpr{n_articles} are articles and \Sexpr{n_reviews} are reviews. Most of the research is collaborative, only \Sexpr{results$AuSingleAuthoredArt} documents have a single author, the average number of authors per document is \num{\Sexpr{mean(results$nAUperPaper)}} and the most common is \Sexpr{AUperPaper_mode}, distributed as in \autoref{fig:AUperPaper_hustogram}. There is also a considerable number of international collaborations: \num{\Sexpr{results$IntColl}}\% of total publications.
+
+<<run_summary, results='hide'>>=
+<<summary>>
+@
+
+\label{tab:main_info}
+<<show_main_info_table>>=
+<<main_info_table>>
+@
 
 \begin{figure}
-<<AUperPaper_histogram, out.width="80%", fig.align='center'>>=
+<<AUperPaper_histogram, out.width="100%", fig.align='center', fig.height=5>>=
 h <- hist(results$nAUperPaper, plot = FALSE)
 plot(h, main = NULL, xlab = "Authors per Paper", labels = T, ylim =c(0,1.2*max(h$counts)))
 @
@@ -243,10 +265,6 @@ Regarding the quality of the data, Table \ref{tab:missing_data} shows that most 
 <<missing_data_table>>
 @
 
-<<run_summary, include=FALSE>>=
-<<summary>>
-@
-
 <<run_slice_2022, include=FALSE>>=
 <<slice_2022>>
 @
@@ -255,16 +273,7 @@ Regarding the quality of the data, Table \ref{tab:missing_data} shows that most 
 <<slice_2012_2022>>
 @
 
-The total time span found in the Web of Science platform for SAF production ranges from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to current year (\Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}), as research on sustainable industries increased on these past two decades. \autoref{fig:annual_scient_prod} shows the annual scientific production on SAF from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to \Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}, the average annual growth rate from \Sexpr{S_2022$AnnualProduction$`Year   `[[1]]} to \Sexpr{S_2022$AnnualProduction$`Year   `[[length(S_2022$AnnualProduction$`Year   `)]]} is \Sexpr{S_2022$AnnualGrowthRate}\%, and \Sexpr{S_2012_2022$AnnualGrowthRate}\% from 2012 to 2022. Until around 2007 there was little interest on SAF research, as can ben seen in \autoref{fig:annual_scient_prod}.
-
-\begin{figure}
-<<plot_annual_scient_prod, results='hide', out.width="80%", fig.align='center'>>=
-plot(S_2022$AnnualProduction, type = "l", lty = 0)
-lines(S_2022$AnnualProduction, type = "l", lty = 1)
-@
-	\caption{SAF research annual production numbers from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to \Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}.}
-	\label{fig:annual_scient_prod}
-\end{figure}
+The total time span found in the Web of Science platform for SAF production ranges from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to current year (\Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}), as research on sustainable industries increased following a global change in energy policy.
 
 <<run_bib_analysis_results_before_AND, results='hide'>>=
 <<bib_analysis_results_before_AND>>
@@ -272,22 +281,95 @@ lines(S_2022$AnnualProduction, type = "l", lty = 1)
 
 Total author count is \Sexpr{results$nAuthors}, before author name disambiguation this number was \Sexpr{results_NOT_ANDED$nAuthors}.
 
+\subsection{Productivity analysis}
+\label{productivity}
+
+\autoref{fig:annual_scient_prod} shows the annual scientific production on SAF in this period. The average annual growth rate from \Sexpr{S_2022$AnnualProduction$`Year   `[[1]]} to \Sexpr{S_2022$AnnualProduction$`Year   `[[length(S_2022$AnnualProduction$`Year   `)]]} is \Sexpr{S_2022$AnnualGrowthRate}\%, and \Sexpr{S_2012_2022$AnnualGrowthRate}\% from 2012 to 2022. Until around 2007 there was little interest on SAF research, as can ben seen in \autoref{fig:annual_scient_prod}.
+
+\begin{figure}
+<<plot_annual_scient_prod, results='hide', out.width="100%", fig.align='center', fig.height=6>>=
+plot(S_2022$AnnualProduction, type = "l", lty = 0)
+lines(S_2022$AnnualProduction, type = "l", lty = 1)
+@
+	\caption{SAF research annual production numbers from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to \Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}.}
+	\label{fig:annual_scient_prod}
+\end{figure}
+
+The most productive countries in terms of number of publications, as can be seen in \autoref{fig:most_prod_countries_npub} are the United States and China. When one looks at the ratio of multiple country to single country publications in \autoref{fig:MCP_ratio}, European countries such as the Netherlands and United Kingdom come ahead, while continental countries with large populations --- USA, China and Brazil --- have room to grow in this aspect.
+
+\begin{figure}
+<<show_most_prod_countries, out.width="100%", fig.height=4, fig.align='center', results='hide'>>=
+<<barplot_most_prod_countries>>
+@
+	\caption{Most productive countries in terms of number of publications.}
+	\label{fig:most_prod_countries_npub}
+\end{figure}
+
+\begin{figure}
+<<show_most_MCP_ratio, out.width="100%", fig.height=4, fig.align='center', results='hide'>>=
+<<plot_int_collab>>
+@
+	\caption{Multiple country to single country publication ratios.}
+	\label{fig:MCP_ratio}
+\end{figure}
+
 \subsection{Textual analysis}
 \label{textual_analysis}
 
-A list of synonyms was created based on the visualization of authors keywords network. Some common strings that carrie little information were also removed ("2", "assessment", "use", "analysis", "performance", "alternative", "green", "process", "environmental"). Equivalent and similar keywords were grouped together in a list. Some assumptions were made to group similar terms, in order to extract more information:
+\subsection{Titles}
+\label{titles_textual_analysis}
 
-\begin{itemize}
-  \item The terms “sustainable” and “aviation fuels” were grouped into “saf”, due to a very high connection;
-\end{itemize}
+Extracted title terms co-occurrence network, in \autoref{fig:titles_network}, reveal the most explored subjects and their relations.
 
-\begin{figure}
-<<show_keyword_network, results='hide', out.width="100%", fig.align='center'>>=
+\begin{figure*}
+<<show_title_keyword_network, results='hide', out.width="100%", fig.align='center', fig.height=3>>=
+<<titles_keywords_co-occurrence_network>>
+@
+	\caption{Titles keywords network.}
+	\label{fig:titles_network}
+\end{figure*}
+
+\subsection{Author's keywords}
+\label{authors_keywords_textual_analysis}
+
+The author's keywords co-occurrence network in \autoref{fig:authors_keyword_network}, complements the titles analysis, bringing to the front some more useful information.
+
+\begin{figure*}
+<<show_keyword_network, results='hide', out.width="100%", fig.align='center', fig.height=3>>=
 <<authors_keywords_co-occurrence_network>>
 @
-	\caption{Keyword network.}
-	\label{fig:keyword_network}
+	\caption{Author's keywords network.}
+	\label{fig:authors_keyword_network}
+\end{figure*}
+
+\subsection{Collaboration networks}
+\label{collaboration_networks}
+
+\subsubsection{Countries}
+\label{countries_collaboration}
+
+\begin{figure*}
+<<show_countries_network, results='hide', out.width="100%", fig.align='center', fig.height=3>>=
+<<country_collaboration_network>>
+@
+	\caption{Countries collaboration network.}
+	\label{fig:countries_network}
+\end{figure*}
+
+\subsection{Citation analysis}
+\label{citation_analysis}
+
+\subsubsection{References publication year spectrocopy}
+\label{rpys}
+\begin{figure}
+<<show_rpys, results='hide', out.width="100%", fig.align='center', fig.height=6>>=
+<<reference_publication_year_spectrocopy>>
+@
+	\caption{References publication year spectrocopy.}
+	\label{fig:rpys}
 \end{figure}
+
+
 
 %% The Appendices part is started with the command \appendix;
 %% appendix sections are then done as normal sections

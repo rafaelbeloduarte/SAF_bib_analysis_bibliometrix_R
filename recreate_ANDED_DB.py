@@ -29,6 +29,8 @@ with open('complete_dataset_ANDED_refined.csv', newline='') as csvfile:
 # objects
 result = pyreadr.read_r('complete_dataset.RData') # also works for Rds
 M = result["M"] # extract the pandas data frame for object M
+# display column names 
+# print(list(M.columns))
 
 # refsplitr gives a list with papers WOS codes and the respective author orders
 # so it is easy to look through the original dataset, which also has WOS codes,
@@ -39,15 +41,17 @@ M = result["M"] # extract the pandas data frame for object M
 AND_wos_codes = []
 for j in range(len(AND_DB)):
     AND_wos_codes.append(AND_DB[j][15].replace(":",""))
+print("WOS codes count: ", len(AND_wos_codes))
 
 # AND index:
 # ['', 'authorID', 'groupID', 'author_name', 'author_order', 'address', 'university', 'department', 'postal_code', 'city', 'state', 'country', 'RP_address', 'RI', 'OI', 'UT', 'refID', 'PT', 'PY', 'PU']
 # loop to replace names
 a = 1
-for i in range(len(M)):
-    original_DB_wos_code = M.UT[i]
+for row in M.index:
+    print("Paper index: ", row)
+    original_DB_wos_code = M.loc[row, 'UT']
     print("WOS code: ", original_DB_wos_code)
-    print("Original names: ", M.AU[i])
+    print("Original names: ", M.loc[row, 'AU'])
 
     indices = [index for index, item in enumerate(AND_wos_codes) if item == original_DB_wos_code]
 
@@ -67,9 +71,9 @@ for i in range(len(M)):
     # convert list back into str
     authors = ';'.join(str(x) for x in authors)
 
-    M.AU[i] = authors
+    M.loc[row, 'AU'] = authors
 
-    print("New names: ", M.AU[i])
+    print("New names: ", M.loc[row, 'AU'])
     print("")
 
 # save the new bibliometrix rds file
