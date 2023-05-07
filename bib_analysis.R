@@ -44,9 +44,9 @@ library(knitr)
 library(kableExtra)
 misssing_data <- missingData(dataset_ANDED)
 ## ---- missing_data_table
-kable(misssing_data$mandatoryTags,  caption = "Missing data.", booktabs = TRUE,
+kable(misssing_data$mandatoryTags,  caption = "Missing data. \\label{tab:missing_data}", booktabs = TRUE,
       col.names = c("Tag",	"Description",	"Missing Counts",	"Missing %", "Status")) %>%
-  kable_styling(latex_options = "scale_down")
+  kable_styling(font_size = 7, latex_options = "scale_down")
 
 ## ---- summary
 S <- summary(object = results, k = 10, pause = FALSE)
@@ -65,18 +65,143 @@ barplot(as.numeric(S$MostProdCountries$MCP_Ratio), names.arg = S$MostProdCountri
 ## ---- main_info_table
 library(knitr)
 library(kableExtra)
-kable(S$MainInformationDF,  format = "latex", caption = "Main information.", booktabs = TRUE) %>%
-  kable_styling(latex_options = "scale_down")
+kable(S$MainInformationDF,  format = "latex", caption = "Main information. \\label{tab:main_info}", booktabs = TRUE) %>%
+  kable_styling(font_size = 7)
+
+## ---- most_relevant_sources
+# get the sources from summary
+most_rel_sources <- S$MostRelSources
+# filter out some characters
+most_rel_sources$`Sources       ` <- gsub("&", "000", most_rel_sources$`Sources       `)
+most_rel_sources$`Sources       ` <- gsub("  ", "", most_rel_sources$`Sources       `)
+most_rel_sources$`Sources       ` <- gsub("[[:punct:]]", " ", most_rel_sources$`Sources       `)
+most_rel_sources$`Sources       ` <- gsub("000", "&", most_rel_sources$`Sources       `)
+most_rel_sources$`Sources       ` <- gsub("[\r\n]", "", most_rel_sources$`Sources       `)
+most_rel_sources$`Sources       ` <- gsub("  ", " ", most_rel_sources$`Sources       `)
+
+most_rel_sources_code <- gsub("[[:punct:]]", " ", most_rel_sources$`Sources       `)
+most_rel_sources_code <- gsub(" ", "", most_rel_sources_code)
+sources_code <- gsub("[[:punct:]]", "", dataset_ANDED$SO)
+sources_code <- gsub(" ", "", sources_code)
+
+# search in dataset_ANDED$SO for the most relevant sources ISSNs
+most_rel_sources_issn <- data.frame()
+for (i in 1:length(most_rel_sources_code)) {
+  indices <- which(sources_code == most_rel_sources_code[[i]])
+  # get the subset that matches and omit NA cells
+  data_subset <- na.omit(dataset_ANDED$SN[indices])
+  # take the mode of the returned values to avoid getting empty rows
+  most_rel_sources_issn <- rbind(most_rel_sources_issn, Mode(data_subset))
+}
+colnames(most_rel_sources_issn) <- "ISSN"
+most_rel_sources$ISSN <- most_rel_sources_issn$ISSN
+
+# get the impact factors
+library(readxl)
+latestJCRlist2022 <- read_excel("latestJCRlist2022.xlsx")
+# search the journals indices in the JCR list by ISSN
+most_rel_sources_impact <- data.frame()
+for (i in 1:length(most_rel_sources$ISSN)) {
+  indices <- which(latestJCRlist2022$issn == most_rel_sources$ISSN[[i]])
+  # get the subset that matches and omit NA cells
+  data_subset <- na.omit(latestJCRlist2022$if_2022[indices])
+  # take the mode of the returned values to avoid getting empty rows
+  if (length(indices) == 0) {
+    most_rel_sources_impact <- rbind(most_rel_sources_impact, NA)
+  }
+  else {
+    most_rel_sources_impact <- rbind(most_rel_sources_impact, data_subset)
+  }
+}
+colnames(most_rel_sources_impact) <- "Impact Factor"
+most_rel_sources$impact_factor <- most_rel_sources_impact$`Impact Factor`
+
+library(rcrossref)
+crossref_data <- cr_journals(issn = most_rel_sources_issn$ISSN)
+most_rel_sources$Publisher <- crossref_data$data$publisher
+
+# calculate the % of SAF articles in relation to the total number of DOIs of the source
+most_rel_sources$perc_of_total_dois <- 100 * as.integer(most_rel_sources$Articles)/crossref_data$data$total_dois
+
+# reorder the table
+colnames(most_rel_sources) <- c("Sources", "Documents", "ISSN", "Impact Factor 2022", "Publisher", "% of total DOIs")
+most_rel_sources <- most_rel_sources[, c("Sources", "Documents", "% of total DOIs", "Impact Factor 2022", "ISSN", "Publisher")]
+
+kable(most_rel_sources,  format = "latex", row.names = FALSE, booktabs = TRUE, escape = TRUE, linesep = "", caption = "Most relevant sources by number of documents. \\label{tab:most_rel_sources}", table.envir = "table*")  %>%
+  kable_styling(font_size = 7, latex_options = "scale_down")
 
 ## ---- most_prod_authors
-kable(S$MostProdAuthors,  format = "latex", caption = "Main information.", booktabs = TRUE) %>%
-  kable_styling(latex_options = "scale_down")
+library(tibble)
+library(dplyr)
+listAU <- (strsplit(dataset_ANDED$AU, ";"))
+nAU <- lengths(listAU)
+fracAU <- rep(1/nAU,nAU)
+most_prod_authors <- tibble(Author=unlist(listAU), fracAU=fracAU) %>% 
+  group_by(.data$Author) %>% 
+  summarize(
+    Articles = n(),
+    AuthorFrac = sum(.data$fracAU)
+  ) %>% 
+  arrange(desc(.data$Articles)) %>% as.data.frame()
+names(most_prod_authors)=c("Authors","Articles","Articles Fractionalized")
+most_prod_authors[1:15,]
+#print(S$MostProdAuthors)
+
+# function to search for authors information
+search_author_info <- function(names_list, df) {
+  authors_info <- data.frame()
+  for (i in 1:length(names_list)) {
+    indices <- which(df$author_name == names_list[[i]])
+    data_subset <- df[indices, ]
+    # if orcid id exists use those lines
+    if (TRUE %in% complete.cases(data_subset[,"OI"])) {
+      data_subset <- data_subset[complete.cases(data_subset[,"OI"]),]
+    }
+    authors_info <- rbind(authors_info, data_subset[1,])
+  }
+  return(authors_info)
+}
+
+library(readr)
+AND_refined <- read_csv("AND_refined.csv")
+# used gsub to clean the names list and make them equal between datasets
+# AND_refined$author_name <- gsub("\\.", "", AND_refined$author_name)
+# remove some empty cells
+AND_refined <- AND_refined[complete.cases(AND_refined[,c("country", "university")]),]
+
+most_prod_authors_info <- search_author_info(most_prod_authors$Author, AND_refined)
+
+most_prod_authors$Affiliation <- most_prod_authors_info$university
+most_prod_authors$Country <- most_prod_authors_info$country
+most_prod_authors$"Orcid ID" <- most_prod_authors_info$OI
+most_prod_authors[1:10,]
+
+## ---- most_prod_authors_table
+kable(most_prod_authors[1:10,],  format = "latex", caption = "Most productive authors. \\label{tab:most_prod_authors}", booktabs = TRUE, table.envir = "table*", digits = 1) %>%
+  kable_styling(font_size = 7, latex_options = "scale_down")
+
+## ---- h_index
+library(dplyr)
+h <- Hindex(dataset_ANDED, field = "author", sep = ";", years=Inf)$H %>% 
+  arrange(desc(h_index))
+h_table <- h[,c("Element", "h_index", "PY_start", "TC", "NP")]
+AND_refined_no_comma <- AND_refined
+AND_refined_no_comma$author_name <- gsub(",", "", AND_refined_no_comma$author_name)
+
+h_index_authors_info <- search_author_info(h_table$Element, AND_refined_no_comma)
+h_table$Affiliation <- h_index_authors_info$university
+h_table$Country <- h_index_authors_info$country
+h_table$"Orcid ID" <- h_index_authors_info$OI
+h_table[0:10,]
+
+## ---- h_index_table
+kable(h_table[0:10,],  format = "latex", caption = "Highest h index authors. \\label{tab:h_index}", booktabs = TRUE, table.envir = "table*", col.names = c("Author", "H index", "First publication", "Total citations", "Publications", "Affilliation", "Country", "Orcid ID")) %>%
+  kable_styling(font_size = 7, latex_options = "scale_down")
 
 ## ---- slice_2022
 dataset_ANDED_2022 <- timeslice(dataset_ANDED, breaks = c(2022))
 results_2022 <- biblioAnalysis(dataset_ANDED_2022$`(1994,2022]`, sep = ";")
 S_2022 <- summary(object = results_2022, k = 10, pause = FALSE)
-
 ## ---- slice_2012_2022
 dataset_ANDED_2012_2022 <- timeslice(dataset_ANDED, breaks = c(2012,2022))
 results_2012_2022 <- biblioAnalysis(dataset_ANDED_2012_2022$`(2012,2022]`, sep = ";")
@@ -194,7 +319,7 @@ net_kw=networkPlot(NetMatrix_TI,
                    remove.isolates = TRUE,
                    noloops = TRUE,
                    edgesize = 0.5,
-                   edges.min = 20,
+                   # edges.min = 50,
                    alpha = 1,
                    halo = FALSE,
                    curved = FALSE);
@@ -350,7 +475,7 @@ webshot(
 netstat_countries <- networkStat(NetMatrix_CO, stat = "all", type = "degree")
 summary(netstat_countries)
 kable(summary(netstat_countries),  caption = "Countries network statistics.", booktabs = TRUE) %>%
-  kable_styling(latex_options = "scale_down")
+  kable_styling(font_size = 7)
 
 ## ---- collaboration_network_between_institutions
 M_AFF <- metaTagExtraction(dataset_ANDED, Field = "AU1_UN", sep = ";");

@@ -44,7 +44,7 @@ write.csv(refs_clean$review,"WOS_dataset/output_refsplitr/refs_clean_review.csv"
 refs_refined <- authors_refine(refs_clean$review, 
                                refs_clean$prelim)
 
-write.csv(refs_refined,"complete_dataset_ANDED_refined.csv")
+write.csv(refs_refined,"AND_refined.csv")
 
 # georef <-authors_georef(data=refs_refined, address_column = "address")
 
