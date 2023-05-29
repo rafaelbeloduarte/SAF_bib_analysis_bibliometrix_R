@@ -40,8 +40,12 @@ refs_clean <- authors_clean(refs)
 write.csv(refs_clean$prelim,"WOS_dataset/output_refsplitr/refs_clean_prelim.csv")
 write.csv(refs_clean$review,"WOS_dataset/output_refsplitr/refs_clean_review.csv")
 
+# load manual review file
+library(readr)
+correctedfile <- read_csv("~/DriveUEMEncrypt/casa/uem/Doutorado/Revisão/SAF_bibliometric_analysis/SAF_bib_analysis_bibliometrix_R/WOS_dataset/output_refsplitr/correctedfile.csv")
+
 # accept the results of author disambiguation
-refs_refined <- authors_refine(refs_clean$review, 
+refs_refined <- authors_refine(correctedfile, 
                                refs_clean$prelim)
 
 write.csv(refs_refined,"AND_refined.csv")

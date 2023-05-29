@@ -19,7 +19,7 @@ import difflib
 
 # load AND database
 AND_DB = []
-with open('complete_dataset_ANDED_refined.csv', newline='') as csvfile:
+with open('AND_refined.csv', newline='') as csvfile:
     AND_data = csv.reader(csvfile, delimiter=',', quotechar='"')
     for row in AND_data:
         AND_DB.append(row)
@@ -62,6 +62,8 @@ for row in M.index:
         authors_tmp.append([AND_DB[k][4],AND_DB[k][3]])
     # sort the list
     authors_tmp.sort()
+    # remove duplicates
+    authors_tmp = [list(item) for item in set(tuple(row) for row in authors_tmp)]
     
     # remove the order information from the list
     authors = []

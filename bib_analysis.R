@@ -343,12 +343,11 @@ net_kw=networkPlot(NetMatrix_kw,
                    labelsize = 3,
                    label.cex = TRUE,
                    label.color = TRUE,
-                   cluster = "walktrap",
+                   cluster = "fast_greedy",
                    community.repulsion = 0.05,
                    remove.isolates = TRUE,
                    noloops = TRUE,
-                   edgesize = 0.5,
-                   edges.min = 2,
+                   edgesize = 1,
                    alpha = 1,
                    halo = FALSE,
                    curved = FALSE);
@@ -360,7 +359,7 @@ library("htmlwidgets")
 # webshot::install_phantomjs()
 
 Tab <- tableTag(dataset_ANDED, Tag = "TI", sep = ";",
-                synonyms = synonyms_list, remove.terms = removed_terms);
+                synonyms = NULL, remove.terms = removed_terms);
 Tab <- log(Tab);
 wc <- wordcloud2(Tab, size = 1, minSize = 0, gridSize =  10,
                    fontFamily = 'Liberation Serif', fontWeight = 'bold',
@@ -559,3 +558,11 @@ net <- histPlot(histResults, size = 5)
 ## ---- conceptual_structure
 CS <- conceptualStructure(dataset_ANDED, field="ID", method="CA",
                           stemming=FALSE, minDegree=10, k.max = 5)
+
+## ---- trend_topics
+removed_terms_trend = c("2", "assessment", "use", "analysis", 
+                        "performance", "alternative", "green",
+                        "process", "environmental", "a.f.", "decarbonization",
+                        "carbon footprint", "saf", "sustainability", "aviation",
+                        "biomass", "climate change", "energy")
+TrendTopics <- fieldByYear(dataset_ANDED, field = "DE", timespan = c(2017,2022), min.freq = 5, n.items = 3, remove.terms = removed_terms_trend, synonyms = synonyms_list, dynamic.plot=FALSE, graph = TRUE)
