@@ -163,7 +163,8 @@ search_author_info <- function(names_list, df) {
 }
 
 library(readr)
-AND_refined <- read_csv("AND_refined.csv")
+
+AND_refined <- read.csv("~/DriveUEMEncrypt/casa/uem/Doutorado/Revisão/SAF_bibliometric_analysis/SAF_bib_analysis_bibliometrix_R/AND_refined.csv")
 # used gsub to clean the names list and make them equal between datasets
 # AND_refined$author_name <- gsub("\\.", "", AND_refined$author_name)
 # remove some empty cells
@@ -188,15 +189,26 @@ h_table <- h[,c("Element", "h_index", "PY_start", "TC", "NP")]
 AND_refined_no_comma <- AND_refined
 AND_refined_no_comma$author_name <- gsub(",", "", AND_refined_no_comma$author_name)
 
+# df <- filter(dataset_ANDED, grepl("Zhang, Xiangwen", AU, fixed = TRUE))
+
 h_index_authors_info <- search_author_info(h_table$Element, AND_refined_no_comma)
 h_table$Affiliation <- h_index_authors_info$university
 h_table$Country <- h_index_authors_info$country
 h_table$"Orcid ID" <- h_index_authors_info$OI
+for (i in 1:10) {
+  df <- filter(dataset_ANDED, grepl(h$Element[i], gsub(",", "", AU), fixed = TRUE))
+  h_table$"Most freq. keywords"[i] <-  toString(rownames(tableTag(df, Tag = "DE", sep = ";",
+                                                                                synonyms = NULL, remove.terms = NULL)[0:5]))
+}
 h_table[0:10,]
 
 ## ---- h_index_table
-kable(h_table[0:10,],  format = "latex", caption = "Highest h index authors. \\label{tab:h_index}", booktabs = TRUE, table.envir = "table*", col.names = c("Author", "H index", "First publication", "Total citations", "Publications", "Affilliation", "Country", "Orcid ID")) %>%
-  kable_styling(font_size = 7, latex_options = "scale_down")
+kable(h_table[0:10,], format = "latex", caption = "Authors' local impact in order of h index. \\label{tab:h_index}", booktabs = TRUE, table.envir = "table*", col.names = c("Author", "H index", "First publication", "Total citations", "Publications", "Affilliation", "Country", "Orcid ID", "Most freq. keywords")) %>%
+  kable_styling(font_size = 7, latex_options = "scale_down") %>%
+  column_spec(9, width = "25em") %>%
+  column_spec(3, width = "5em") %>%
+  column_spec(4, width = "5em")
+
 
 ## ---- slice_2022
 dataset_ANDED_2022 <- timeslice(dataset_ANDED, breaks = c(2022))
@@ -207,6 +219,31 @@ dataset_ANDED_2012_2022 <- timeslice(dataset_ANDED, breaks = c(2012,2022))
 results_2012_2022 <- biblioAnalysis(dataset_ANDED_2012_2022$`(2012,2022]`, sep = ";")
 S_2012_2022 <- summary(object = results_2012_2022, k = 10, pause = FALSE)
 
+## ---- slice_2016_2020
+library(dplyr)
+dataset_ANDED_2016_2020 <- timeslice(dataset_ANDED, breaks = c(2015, 2020))
+results_2016_2020 <- biblioAnalysis(dataset_ANDED_2016_2020$'(2015,2020]', sep = ";")
+results_2020_2023 <- biblioAnalysis(dataset_ANDED_2016_2020$'(2020,2023]', sep = ";")
+total_reviews <- results[["Documents"]][["REVIEW                         "]]
+reviews_2016_2020 <- results_2016_2020[["Documents"]][["REVIEW                         "]]
+reviews_2020_2023 <- results_2020_2023[["Documents"]][["REVIEW                  "]]
+
+## ---- plot_review_age_vs_citation
+library(dplyr)
+reviews_dataset <- filter(dataset_ANDED, DT == "REVIEW")
+article_dataset <- filter(dataset_ANDED, DT == "ARTICLE")
+results_review <- biblioAnalysis(reviews_dataset, sep = ";")
+results_article <- biblioAnalysis(reviews_dataset, sep = ";")
+review_age <- 2024 - reviews_dataset$PY
+article_age <- 2024 - article_dataset$PY
+review_citations_per_year <- reviews_dataset$TC/review_age
+article_citations_per_year <- article_dataset$TC/article_age
+plot(article_age-1,article_citations_per_year, type = "p", lty = 0, pch = 4, col = "gray", xlab = "Age in years", ylab = "Total citations/age", ylim = c(0,max(review_citations_per_year, article_citations_per_year)))
+lines(review_age-1, review_citations_per_year, type = "p", lty = 0)
+legend(x = 1, y = max(review_citations_per_year, article_citations_per_year), c("Articles", "Reviews"), pch = c(4,1), col = c("gray", "black"))
+
+# boxplot(article_citations_per_year, review_citations_per_year, names = c("Articles", "Reviews"),  ylab = "Total citations/age")
+
 ## ---- bib_analysis_results_before_AND
 dataset_NOT_ANDED <- convert2df("complete_dataset.bib", dbsource = "wos", format = "bibtex")
 results_NOT_ANDED <- biblioAnalysis(dataset_NOT_ANDED, sep = ";")
@@ -214,6 +251,7 @@ results_NOT_ANDED <- biblioAnalysis(dataset_NOT_ANDED, sep = ";")
 ## ---- author_collaboration_network
 M_AU <- metaTagExtraction(dataset_ANDED, Field = "AU", sep = ";");
 NetMatrix_AU <- biblioNetwork(M_AU, analysis = "collaboration", network = "authors", sep = ";");
+par(mar=c(0,2,0,2))
 net_AU=networkPlot(NetMatrix_AU,
                    n = 50,
                    normalize = "association",
@@ -223,14 +261,14 @@ net_AU=networkPlot(NetMatrix_AU,
                    size.cex = TRUE,
                    remove.multiple=FALSE,
                    label = TRUE,
-                   labelsize = 2,
+                   labelsize = 3,
                    label.color = TRUE,
                    cluster = "edge_betweenness",
                    community.repulsion = 0.0001,
                    label.cex = TRUE,
-                   remove.isolates = TRUE,
-                   edgesize = 1,
-                   alpha = 0.7,
+                   remove.isolates = FALSE,
+                   edgesize = 2,
+                   alpha = 0.6,
                    halo = FALSE);
 
 # net2VOSviewer(net_AU);
@@ -240,19 +278,20 @@ removed_terms = c("2", "assessment", "use", "analysis",
                   "performance", "alternative", "green",
                   "process", "environmental")
 synonyms_list=c("a.f.;alternative fuels;alternative fuel;biofuels;
-                bio-fuels;biofuel;bio-fuel;bio-oil;fuels;fuel;
+                bio-fuels;biofuel;bio-fuel;bio-oil;
                 advanced biofuels",
                 "saf;sustainable aviation fuel;
                 sustainable aviation fuel (saf);
-                sustainable aviation fuels;bio-jet fuel;
+                sustainable aviation fuels",
+                "bio-jet fuel;
                 jet biofuel;biojet fuel;bio jet fuel;
                 bio-jet fuels;bio jet fuel ;bio-jet;
                 bio-kerosene;biokerosene;
                 aviation biofuel;aviation biofuels;
-                bio-aviation fuel; aviation biofuels ;biojet;
-                alternative jet fuel;alternative jet fuels;
-                renewable jet fuel;renewable aviation fuel;
-                aviation fuels;aviation fuel;jet fuel;
+                bio-aviation fuel; aviation biofuels ;biojet",
+                "alternative jet fuel;alternative jet fuels;
+                renewable jet fuel;renewable aviation fuel",
+                "aviation fuels;aviation fuel;jet fuel;
                 aviation fuels;jet;kerosene;jet a-1",
                 "sustainability;sustainable development;
                 sustainable;environmental impact",
@@ -278,7 +317,6 @@ synonyms_list=c("a.f.;alternative fuels;alternative fuel;biofuels;
                 "hydroprocessing;hydrogenation;
                 hydrocracking;hydrotreating",
                 "isomerization;hydroisomerization",
-                "cellulose;lignocellulose",
                 "efficiency;energy efficiency",
                 "combustion;combustion characteristics",
                 "fts;fischer-tropsch"
@@ -312,15 +350,15 @@ net_kw=networkPlot(NetMatrix_TI,
                    size = 15,
                    size.cex = TRUE,
                    remove.multiple=TRUE,
-                   labelsize = 3,
-                   label.cex = TRUE,
-                   cluster = "walktrap",
+                   labelsize = 1.1,
+                   label.cex = FALSE,
+                   cluster = "none",
                    community.repulsion = 0.1,
                    remove.isolates = TRUE,
                    noloops = TRUE,
                    edgesize = 0.5,
                    # edges.min = 50,
-                   alpha = 1,
+                   alpha = 0.6,
                    halo = FALSE,
                    curved = FALSE);
 
@@ -333,22 +371,22 @@ NetMatrix_kw <- biblioNetwork(dataset_ANDED, analysis = "co-occurrences",
 # net2VOSviewer(net_kw);
 par(mar=c(0,0,0,0))
 net_kw=networkPlot(NetMatrix_kw,
-                   n = 50,
+                   n = 60,
                    normalize = "association",
                    Title = NULL,
                    type = "fruchterman",
                    size = 10,
                    size.cex = TRUE,
                    remove.multiple=TRUE,
-                   labelsize = 3,
-                   label.cex = TRUE,
+                   labelsize = 0.6,
+                   label.cex = FALSE,
                    label.color = TRUE,
                    cluster = "fast_greedy",
-                   community.repulsion = 0.05,
+                   community.repulsion = 0.1,
                    remove.isolates = TRUE,
                    noloops = TRUE,
                    edgesize = 1,
-                   alpha = 1,
+                   alpha = 0.6,
                    halo = FALSE,
                    curved = FALSE);
 
@@ -378,6 +416,74 @@ webshot(
   vheight = 1080
 )
 
+## ---- most_locally_cited_papers
+library(knitr)
+library(kableExtra)
+library(rcrossref)
+local_citations <- localCitations(dataset_ANDED, fast.search = FALSE, sep = ";", verbose = FALSE)
+local_citations_crossref_data <- cr_works(dois = local_citations$Papers$DOI[1:10])
+citation_ratio <- local_citations$Papers$LCS/local_citations$Papers$GCS
+local_citations_df <- data.frame(Titles=local_citations_crossref_data$data$title, Year=as.numeric(local_citations$Papers$Year[1:10]), Local_Citations=as.numeric(local_citations$Papers$LCS[1:10]), Global_Citations=as.numeric(local_citations$Papers$GCS[1:10]), LC_GC_ratio = citation_ratio[1:10])
+kable(local_citations_df[1:10,], format = "latex", caption = "Most locally cited papers. \\label{tab:most_locally_cited}", booktabs = TRUE, table.envir = "table*", col.names = c("Title (DOIs are provided as hyperlinks)", "Year", "Local citations (LC)", "Global citations (GC)", "LC/GC ratio")) %>%
+  kable_styling(font_size = 7, latex_options = "scale_down") %>%
+  column_spec(3, width = "5em") %>%
+  column_spec(4, width = "5em") %>%
+  column_spec(5, width = "5em") %>%
+  column_spec(1, link = local_citations_crossref_data$data$url)
+
+## ---- most_locally_cited_papers_analysis
+library(dplyr)
+most_cited <- dplyr::filter(dataset_ANDED, DI == local_citations[["Papers"]][["DOI"]][1])
+for (i in 2:10){
+  print(i)
+  most_cited[nrow(most_cited) + 1,] <- dplyr::filter(dataset_ANDED, DI == local_citations[["Papers"]][["DOI"]][i])
+}
+
+NetMatrix_most_cited <- biblioNetwork(most_cited, analysis = "co-occurrences",
+                              network = "author_keywords", sep = ";",
+                              synonyms = NULL,
+                              remove.terms = NULL);
+net_most_cited=networkPlot(NetMatrix_most_cited,
+                   n = 50,
+                   normalize = "association",
+                   Title = NULL,
+                   type = "fruchterman",
+                   size = 10,
+                   size.cex = TRUE,
+                   remove.multiple=TRUE,
+                   labelsize = 0.7,
+                   label.cex = FALSE,
+                   label.color = TRUE,
+                   cluster = "walktrap",
+                   community.repulsion = 0.01,
+                   remove.isolates = TRUE,
+                   noloops = TRUE,
+                   edgesize = 1,
+                   alpha = 0.6,
+                   halo = FALSE,
+                   curved = FALSE);
+
+M_AU_most_cited <- metaTagExtraction(most_cited, Field = "AU", sep = ";");
+NetMatrix_AU_most_cited <- biblioNetwork(M_AU_most_cited, analysis = "collaboration", network = "authors", sep = ";");
+net_AU_most_cited=networkPlot(NetMatrix_AU_most_cited,
+                   n = 1000,
+                   normalize = "association",
+                   Title = NULL,
+                   type = "fruchterman",
+                   size = 1,
+                   size.cex = F,
+                   remove.multiple=FALSE,
+                   label = TRUE,
+                   labelsize = 0.8,
+                   label.color = TRUE,
+                   cluster = "edge_betweenness",
+                   community.repulsion = 0.01,
+                   label.cex = TRUE,
+                   remove.isolates = TRUE,
+                   edgesize = 1,
+                   alpha = 0.7,
+                   halo = FALSE);
+
 ## ---- keyword_growth
 topKW=KeywordGrowth(dataset_ANDED, Tag = "ID", sep = ";", top=10, cdf=TRUE)
 topKW
@@ -401,14 +507,14 @@ net_CO=networkPlot(NetMatrix_CO,
                 size = 10,
                 size.cex = TRUE,
                 remove.multiple=FALSE,
-                labelsize = 3,
+                labelsize = 6,
                 cluster = "edge_betweenness",
                 community.repulsion = 0.05,
                 label.cex = TRUE,
-                remove.isolates = TRUE,
+                remove.isolates = FALSE,
                 edgesize = 5,
                 edges.min = 5,
-                alpha = 1,
+                alpha = 0.5,
                 curved = FALSE);
 # net2VOSviewer(net_CO);
 
@@ -480,14 +586,14 @@ kable(summary(netstat_countries),  caption = "Countries network statistics.", bo
 M_AFF <- metaTagExtraction(dataset_ANDED, Field = "AU1_UN", sep = ";");
 NetMatrix_AFF <- biblioNetwork(M_AFF, analysis = "collaboration", network = "universities", sep = ";");
 net_AFF=networkPlot(NetMatrix_AFF,
-                n = 30,
+                n = 50,
                 normalize = "association",
                 Title = NULL,
                 type = "auto",
                 size = 10,
                 size.cex = TRUE,
                 remove.multiple=FALSE,
-                labelsize=2,
+                labelsize=5,
                 cluster = "edge_betweenness",
                 community.repulsion = 0.01,
                 label.cex = TRUE,
@@ -565,4 +671,81 @@ removed_terms_trend = c("2", "assessment", "use", "analysis",
                         "process", "environmental", "a.f.", "decarbonization",
                         "carbon footprint", "saf", "sustainability", "aviation",
                         "biomass", "climate change", "energy")
-TrendTopics <- fieldByYear(dataset_ANDED, field = "DE", timespan = c(2017,2022), min.freq = 5, n.items = 3, remove.terms = removed_terms_trend, synonyms = synonyms_list, dynamic.plot=FALSE, graph = TRUE)
+TrendTopics <- fieldByYear(dataset_ANDED, field = "DE", timespan = c(2017,2023), min.freq = 5, n.items = 3, remove.terms = removed_terms_trend, synonyms = synonyms_list, dynamic.plot=FALSE, graph = TRUE)
+
+## ---- aircraft_design_filter
+library(dplyr)
+df_aircraft_design <- filter(dataset_ANDED, grepl("AIRCRAFT DESIGN", DE))
+
+## ---- aircraft_design_filter_results
+results_aircraft_design <- biblioAnalysis(df_aircraft_design, sep = ";")
+S_aircraft_design <- summary(object = results_aircraft_design, k = 10, pause = FALSE)
+S_aircraft_design
+
+## ---- aircraft_design_keyword_network
+NetMatrix_kw_AD <- biblioNetwork(df_aircraft_design, analysis = "co-occurrences",
+                              network = "author_keywords", sep = ";");
+
+par(mar=c(0,0,0,0))
+net_kw_AD=networkPlot(NetMatrix_kw_AD,
+                   n = 30,
+                   normalize = "association",
+                   Title = NULL,
+                   type = "fruchterman",
+                   size = 10,
+                   size.cex = TRUE,
+                   remove.multiple=TRUE,
+                   labelsize = 1,
+                   label.cex = FALSE,
+                   label.color = TRUE,
+                   cluster = "none",
+                   community.repulsion = 0,
+                   remove.isolates = FALSE,
+                   noloops = TRUE,
+                   edgesize = 2,
+                   alpha = 0.8,
+                   halo = FALSE,
+                   curved = FALSE);
+## ---- aircraft_design_wordcloud
+library(wordcloud2)
+
+Tab_AD <- tableTag(df_aircraft_design, Tag = "TI", sep = ";");
+Tab_AD <- log(Tab_AD);
+wc_AD <- wordcloud2(Tab_AD, size = 1, minSize = 0, gridSize =  10,
+                 fontFamily = 'Liberation Serif', fontWeight = 'bold',
+                 color = 'random-dark', backgroundColor = "white",
+                 minRotation = -pi/4, maxRotation = pi/4, shuffle = FALSE,
+                 rotateRatio = 0, shape = 'circle', ellipticity = 0.8,
+                 widgetsize = NULL, figPath = NULL, hoverFunction = NULL);
+wc_AD
+
+## ---- term_search_and_exproration
+library(dplyr)
+df <- filter(dataset_ANDED, grepl("TIANJIN UNIV", affiliations))
+
+results_term <- biblioAnalysis(df, sep = ";")
+S_term <- summary(object = results_term, k = 10, pause = FALSE)
+S_term
+
+NetMatrix_term <- biblioNetwork(df, analysis = "co-occurrences",
+                                 network = "author_keywords", sep = ";");
+# par(mar=c(0,0,0,0))
+net_term=networkPlot(NetMatrix_term,
+                      n = 30,
+                      normalize = "association",
+                      Title = NULL,
+                      type = "fruchterman",
+                      size = 10,
+                      size.cex = TRUE,
+                      remove.multiple=TRUE,
+                      labelsize = 0.8,
+                      label.cex = FALSE,
+                      label.color = TRUE,
+                      cluster = "none",
+                      community.repulsion = 0,
+                      remove.isolates = FALSE,
+                      noloops = TRUE,
+                      edgesize = 2,
+                      alpha = 0.8,
+                      halo = FALSE,
+                      curved = FALSE);

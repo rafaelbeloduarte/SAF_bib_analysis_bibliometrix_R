@@ -27,7 +27,7 @@
 %% \documentclass[preprint,10pt]{elsarticle}
 
 %% Use the option review to obtain double line spacing
-%% \documentclass[preprint,review,12pt]{elsarticle}
+\documentclass[preprint,review,times,12pt]{elsarticle}
 
 %% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
 %% for a journal layout:
@@ -36,7 +36,7 @@
 %% \documentclass[final,3p,times]{elsarticle}
 %% \documentclass[final,3p,times,twocolumn]{elsarticle}
 %% \documentclass[final,5p,times]{elsarticle}
-\documentclass[final,5p,times,twocolumn]{elsarticle}
+%\documentclass[final,5p,times,twocolumn]{elsarticle}
 
 \newcommand{\abbreviations}[1]{%
   \nonumnote{\textit{Abbreviations:\enspace}#1}}
@@ -73,16 +73,23 @@
 \counterwithin{figure}{section}
 \counterwithin{table}{section}
 \usepackage{float}
+\usepackage{breakurl}
+\def\UrlBreaks{\do\-\do-}
+\def\UrlBreaks{\do\/\do-}
 
 %% The lineno packages adds line numbers. Start line numbering with
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
 %% for the whole article with \linenumbers.
 \usepackage{lineno}
 
-\journal{Fuel}
+\usepackage{pdfpages}
+
+\journal{Renewable and Sustainable Energy Reviews}
 
 \begin{document}
 % \SweaveOpts{concordance=TRUE}
+
+\includepdf[pages=-]{cover_letter.pdf}
 
 \begin{frontmatter}
 
@@ -111,7 +118,7 @@
 %%             country={}}
 %% \fntext[label3]{}
 
-\title{Sustainable aviation fuel research bibliometric analysis: patterns and trends}
+\title{Historical perspective on sustainable aviation fuels: a bibliometric analysis}
 
 %% use optional labels to link authors explicitly to addresses:
 %% \author[label1,label2]{}
@@ -168,7 +175,7 @@ SAF, Sustainable Aviation Fuel;
 <<echo=FALSE,cache=FALSE>>=
 library(knitr)
 options(scipen=1, digits=2)
-knitr::opts_chunk$set(echo=FALSE, cache=TRUE, tidy=TRUE, tidy.opts=list(width.cutoff=20))
+knitr::opts_chunk$set(echo=TRUE, cache=TRUE, tidy=TRUE, tidy.opts=list(width.cutoff=20))
 knitr::read_chunk('bib_analysis.R')
 @
 
@@ -178,7 +185,7 @@ knitr::read_chunk('bib_analysis.R')
 <<word_cloud>>
 @
 
-<<run_summary, results='hide'>>=
+<<run_summary, echo=FALSE, results='hide'>>=
 <<summary>>
 @
 
@@ -188,7 +195,7 @@ knitr::read_chunk('bib_analysis.R')
 
 \begin{abstract}
 %% Text of abstract
-As international initiatives such as the Carbon Offsetting and Reduction Scheme for International Aviation (CORSIA) have set goals for the complete decarbonization of international aviation in this century, sustainable aviation fuel (SAF) research has increased substantially, in the past decade the average yearly growth rate reached \Sexpr{S_2012_2022$AnnualGrowthRate}\%, in \Sexpr{S$AnnualProduction$`Year   `[[25]]} alone \Sexpr{S$AnnualProduction$Articles[[25]]} documents were published. This paper aims to provide an overview on SAF research to point one to the field foundations and, possibly, the future of it. Data from de Web of Science database was collected and analysed; the most important papers, cooperation networks, textual analysis, productivity and trends are provided. The most productive countries are in the global north, lead by the United States and China.
+International initiatives such as the Carbon Offsetting and Reduction Scheme for International Aviation (CORSIA) have set goals for the complete decarbonization of international aviation in this century. This motivated increasing numbers of Sustainable Aviation Fuel (SAF) research projects. In the past decade the average yearly growth rate reached \Sexpr{S_2012_2022$AnnualGrowthRate}\%, in \Sexpr{S$AnnualProduction$`Year   `[[25]]} alone \Sexpr{S$AnnualProduction$Articles[[25]]} documents were published. This paper provides an overview on SAF research to point one to its foundations and, possibly, the future. Data from the Web of Science database was collected and investigated. Important papers, cooperation networks, textual analysis, productivity and trends analysis is provided. The most productive countries are in the global north, lead by the United States and China. Big developing nations such as India and Brazil need to improve. The future of a sustainable aviation sector is heading in the direction of replacement of conventional jet fuel by synthetic hydrocarbon fuels by the end of the century, but there are still doubts about its viability both from the environmental and practical aspects, as there are concerns about feedstock availability and life cycle emissions. Longer term prospects are for the development of more efficient aircraft powered by non-hydrocarbon energy sources.
 \end{abstract}
 
 %%Graphical abstract
@@ -198,13 +205,13 @@ As international initiatives such as the Carbon Offsetting and Reduction Scheme 
 
 %%Research highlights
 \begin{highlights}
-\item Highlight 2
-\item Highlight 2
+\item Recent international agreements and policies caused a boom in sustainable aviation fuel research (SAF);
+\item Although base technologies for SAF production have been well established, there are still many problems to be solved on its industrial scale implementation, which put short term viability in question.
 \end{highlights}
 
 \begin{keyword}
 %% keywords here, in the form: keyword \sep keyword
-saf \sep bibliometric analysis
+saf \sep sustainable aviation fuel \sep bibliometric analysis
 
 %% PACS codes here, in the form: \PACS code \sep code
 
@@ -221,53 +228,43 @@ saf \sep bibliometric analysis
 \section{Introduction}
 \label{introduction}
 
-Because of the finite fossil fuel sources and the impracticality of replacing liquid chemical fuels for alternatives such as batteries, especially for the aviation sector, technologies for the production of synthetic liquid fuels are required. However far the exhaustion of fossil fuel sources is, it is prudent to have such alternatives ready to deploy. For this reason governments and the scientific community have been trying to solve this question for the past two decades at least.
+Because of the finite fossil fuel sources and the impracticality of replacing liquid chemical fuels for alternatives such as batteries, especially for the aviation sector, technologies for the production of synthetic liquid fuels are required. However far the exhaustion of fossil fuel sources is, it is prudent to have such alternatives ready to deploy. For this reason governments, the private sector and the scientific community have been trying to solve this question for the past two decades at least.
 
-The aviation sector is particularly dependent on liquid hydrocarbons. Aircraft are built to last many decades, so that there will be a need for drop-in fuels, that is, fuels that can be used in current aircraft without any need for modifications. Another reason is that aircraft must be light, ruling out current battery technology.
+The aviation sector is particularly dependent on liquid hydrocarbons. Aircraft are built to last many decades, so there will be a need for drop-in fuels, that is, fuels that can be used in current aircraft without any need for modifications. Another reason is that aircraft must be light, ruling out current battery technology.
 
-The production of synthetic fuels only makes sense in mixed or fully renewable grid \cite{barke_are_2022}. The conversion of biomass --- sources of carbon --- to liquid fuels such as sustainable aviation fuel (SAF), is an energy intensive process, thus the reason to operate in a petroleum free manner, otherwise carbon accumulation in the atmosphere would be greater for SAF plus fossil energy than in a pure fossil energy sector. Another concern is with the availability of green hydrogen for some processes such as hydrodeoxygenation of oils and fatty acids \cite{alonso_catalytic_2010} as most of current hydrogen is supplied from natural gas reforming. In this way \ce{H2} producing SAF routes can be merged with \ce{H2} consuming ones to reduce environmental impacts \cite{alonso_catalytic_2010}.
+The production of synthetic fuels only makes sense in mixed or fully renewable grid \cite{barke_are_2022}. The conversion of biomass --- sources of carbon --- to liquid fuels such as sustainable aviation fuel (SAF), is an energy intensive process, thus the reason to operate in a petroleum free manner, otherwise carbon accumulation in the atmosphere would be greater for SAF plus fossil energy than in a pure fossil energy sector. Another concern is with the availability of green hydrogen for some processes such as hydrodeoxygenation of oils and fatty acids \cite{alonso_catalytic_2010} as most of current hydrogen is supplied from natural gas reforming. In this way, \ce{H2} producing SAF routes can be merged with \ce{H2} consuming ones to reduce environmental impacts \cite{alonso_catalytic_2010}.
 
-The most mentioned SAF production processes are: (1) biomass biodigestion to produce biogas (\ce{CO2 + CH4}), which is reformed to syn-gas; or biomass direct gasification (partial combustion) to syn-gas, that is then fed to a Fischer-Tropsch Synthesis reactor (FTS) to produce aliphatic and branched hydrocarbons; (2) alcohol-to-jet (ATJ) is another promising technology, it takes alcohols and puts them through a oligomerization process to produce hydrocarbons \cite{wang_bio-jet_2016}. The advantage of ATJ is that it can mobilize the already developed ethanol production plants, which have successfully operated for many decades in countries such as Brazil; (3) the third main route for hydrocarbon production from biomass is the hydroprocessing of esters and fatty acids (HEFA), which takes animal fats and vegetable oils and puts them through high temperature and hydrogen pressure to dehydrate and hydrogenate the oils into a deoxygenated mixture similar in nature to crude oil.
+The most mentioned SAF production processes are: (1) biomass biodigestion to produce biogas (\ce{CO2 + CH4}), which is reformed to syn-gas; or biomass direct gasification (partial combustion) to syn-gas, that is then fed to a Fischer-Tropsch Synthesis reactor (FTS) to produce aliphatic and branched hydrocarbons; (2) alcohol-to-jet (ATJ) is another promising technology, it puts alcohols through a oligomerization process to produce hydrocarbons \cite{wang_bio-jet_2016}. The advantage of ATJ is that it can mobilize the already developed ethanol production plants, which have successfully operated for many decades in countries such as Brazil; (3) the third main route for hydrocarbon production from biomass is the hydroprocessing of esters and fatty acids (HEFA), which processes animal fats and vegetable oils in high temperature and hydrogen pressure to dehydrate and hydrogenate the oils into a deoxygenated mixture similar in nature to crude oil.
 
-In this context this paper aims to provide thorough bibliometric analysis of the available literature so researchers can orient themselves. To avoid already explored paths and perhaps hint at promising ones. Such analysis is also useful for those ones desiring to conduct a literature review: a statistical analysis of the bibliometric space can point researchers in the direction of fundamental literature that is not always evident in a superficial unoriented search. A literature review based on bibliometric analysis is also less likely to be biased by an author's personal preference because of its statistical nature. Nevertheless, one must try to avoid inserting bias into the research question, this is why this paper is founded on a very generic search query. Even with this precaution, during the analysis the chosen search term --- sustainable aviation fuel --- presented itself as not always true to its sustainable nature. It is a common term used in the literature that sometimes is used to refer to synthetic aviation fuel sourced from non-fossil carbon. The problem with this is that even if the feedstock is non-fossil, the resulting product might not be sustainable. Perhaps a more appropriate term for the cases when authors can not guarantee sustainability would be "alternative aviation fuel". One such approach to assess sustainability is life cycle assessment. Still, the "sustainable aviation fuel" query was kept even if the term is sometimes incorrectly used, as the focus of this analysis is on truly sustainable aviation fuels.
+In this context this paper's objective is to produce a thorough bibliometric analysis of the available literature so new SAF researchers can orient themselves. To avoid already explored paths and perhaps hint at promising ones. Such analysis is also useful for those desiring to conduct a literature review. A statistical analysis of the bibliometric space can point researchers in the direction of fundamental literature that is not always evident in a superficial unoriented search. A literature review based on bibliometric analysis is also less likely to be biased by an author's personal preference because of its statistical nature. Nevertheless, one must try to avoid inserting bias into the research question, this is why this paper is founded on a very generic search query. Even with this precaution, during the analysis the chosen search term --- sustainable aviation fuel --- presented itself as not always true to its sustainable nature. It is a common term used in the literature that sometimes is used to refer to synthetic aviation fuel sourced from non-fossil carbon. The problem with the SAF term is that even if the feedstock is non-fossil, the resulting product might not be sustainable. Perhaps a more appropriate term for the cases when authors can not guarantee sustainability would be 'alternative aviation fuel'. One such approach to assess sustainability is life cycle assessment. Still, the 'sustainable aviation fuel' query was kept even if the term is sometimes incorrectly used by some authors, as the focus of this analysis is on truly sustainable aviation fuels.
 
 \section{Methods}
 \label{methods}
 
-This paper was written using a systematic methodology published by Aria and Cuccurullo \cite{aria_bibliometrix_2017} based on the R programming language. A versatile tool that can provide way beyond statistical calculations, it is a full fledged computer language that can even generate automatic reports, such as this paper, written using the R 'knitr' package in conjunction with \LaTeX. All code used here was licensed under GPL. One hopes it to be helpful in future research.
+This paper is based on a systematic methodology published by Aria and Cuccurullo \cite{aria_bibliometrix_2017} to be used with the R software environment and a package developed by the same authors named 'bibliometrix'. R is a versatile tool that can provide way beyond statistical calculations, it is a full fledged computer language that can even generate automatic reports, such as this paper, written using the R 'knitr' package in conjunction with \LaTeX. All code used here was licensed under the GNU General Public Licence Version 3. The code is provided \href{https://github.com/rafaelbeloduarte/SAF_bib_analysis_bibliometrix_R.git}{here}. One hopes it to be helpful in future research.
 
 \subsection{Data collection and research query}
 \label{method_data_collection}
 
-The complete dataset regarding Sustainable Aviation Fuels were collected from the Web of Science platform using the query “sustainable aviation fuel OR aviation biofuel OR aviation bio fuel OR bio-jet fuel OR bio jet fuel OR bio-aviation fuel OR bio aviation fuel (Topic)”. No time span restriction was set; this was done to get the whole historical timeline of this field.
-
-Most of the results were generated using R, in particular the package 'bibliometrix' by Aria and Cuccurullo \cite{aria_bibliometrix_2017}.
+The complete dataset regarding Sustainable Aviation Fuels was collected from the Web of Science platform using the query 'sustainable aviation fuel OR aviation biofuel OR aviation bio fuel OR bio-jet fuel OR bio jet fuel OR bio-aviation fuel OR bio aviation fuel (Topic)'. No time span restriction was set; this was done to get the whole historical timeline.
 
 \subsection{Author name disambiguation}
 \label{method_AND}
 
-In order to have a more accurate author count as well as better collaboration networks, it is necessary to perform author name disambiguation, in other words, to identify authors that written their names in different ways (synonyms) and different authors with the same name (homonyms). The R package “refsplitr” by ref. \cite{fournier_refsplitr_2020} was used for this purpose via \href{https://github.com/rafaelbeloduarte/SAF_bib_analysis_bibliometrix_R/blob/17412aa7544b8d78e61c24d38f667f9de1db4323/AND.R}{Script 1}. It automatically disambiguates names and puts the ones it can not resolve into a list for manual review. This was done by looking at authors' affiliations, coauthors, Orcid IDs and e-mail addressees. The list of authors synonyms and homonyms was fed into \href{https://github.com/rafaelbeloduarte/SAF_bib_analysis_bibliometrix_R/blob/17412aa7544b8d78e61c24d38f667f9de1db4323/recreate_ANDED_DB.py}{Script 2}, written in python to replace the names on the WOS dataset.
+In order to have a more accurate author count as well as better collaboration networks, it is necessary to perform author name disambiguation, in other words, to identify authors that written their names in different ways (synonyms) as well as different authors with the same name (homonyms). The R package 'refsplitr' by ref. \cite{auriel_fournier_refsplitr_2020} was used for this purpose via the script named 'AND.R' provided in the repository linked above. It automatically disambiguates names and puts the ones it can not resolve into a list for manual review. Which was done by looking at authors' affiliations, list of coauthors, Orcid IDs and e-mail addresses. The disambiguated list of authors synonyms and homonyms was fed into a second script named 'recreate\_ANDED\_DB.py', written in python to replace the names in the WOS dataset, which was then used as input for script 'bib\_analysis.R' for generating most of the figures and tables presented here.
 
-\subsection{Visualization of bibliographic networks}
-\label{method_network_visualization}
+\subsection{Textual analysis}
+\label{method_textual_analysis}
 
-For keywords visualization:
-Author’s keywords is more fragmented compared to Web of Science Keywords Plus, which is extracted from titles.
+% For the generation of titles terms co-occurance network, the 'termExtraction' function from 'bibliometrix' were used to extract unigrams from titles, which was then used to generate a co-occurance network with filtered terms. The network was plotted using the Fruchterman-Reingold \cite{fruchterman_graph_1991} layout. Remaining parameters are provided below.
 
-\subsubsection{Titles}
-\label{method_titles_textual_analysis}
+%<<title_network_code, echo=FALSE, eval=FALSE>>=
+%<<titles_keywords_co-occurrence_network>>
+%@
 
-For the generation of titles terms co-occurance network, the 'termExtraction' function from 'bibliometrix' were used to extract unigrams from titles, which was then used to generate a co-occurance network with filterd terms. The network was plotted using the Fruchterman-Reingold \cite{fruchterman_graph_1991} layout. Remaining parameters are provided below.
+Textual analysis is the study of the words and expressions frequently used by the authors. The objective is to uncover the most relevant terms and how they relate. To improve graphical visualization, a list of common words that provide no information, and a list of synonyms were used to filter and group the terms. The lists were created by iteratively visualizing keyword networks and manually grouping terms at each run. Removed terms are strings that were judged to carry little information like: '2', 'assessment', 'use', 'analysis', 'performance', 'alternative', 'green', 'process' and  'environmental'; as one assumes that the research query 'sustainable aviation fuels' is 'green', involves 'alternative' fuels and good 'environmental' practices.
 
-<<title_network_code, echo=FALSE, eval=FALSE>>=
-<<titles_keywords_co-occurrence_network>>
-@
-
-The filtered terms are comprised of a list of synonyms  created based on repeated visualizations the network, manually grouping terms on each run. Some common strings that carry little information were also removed ("2", "assessment", "use", "analysis", "performance", "alternative", "green", "process", "environmental"). Some assumptions were made to group the similar terms, in order to extract more information:
-
-\begin{itemize}
-  \item The terms “sustainable” and “aviation fuels” were grouped into “saf”, due to a very high connection;
-\end{itemize}
+The generation of a synonym list is also important. Otherwise frequent terms conceal less frequent --- but not less important --- ones. The synonyms list include keywords like 'sustainable aviation fuel', also written as 'SAF'; and 'alternative fuels' which was grouped into 'biofuels', 'bio-fuels', 'biofuel', 'bio-fuel', 'bio-oil', 'advanced biofuels' and referred in the figures as 'a.f.'. The complete lists are not shown here for brevity but are provided in the file 'bib\_analysis.R' of the \href{https://github.com/rafaelbeloduarte/SAF_bib_analysis_bibliometrix_R.git}{repository} under the variables named 'removed\_terms' and 'synonyms\_list'.
 
 \section{Results}
 \label{results}
@@ -275,59 +272,61 @@ The filtered terms are comprised of a list of synonyms  created based on repeate
 \subsection{Overview}
 \label{overview}
 
-Table \ref{tab:main_info} shows the main information about the data. The query returned \Sexpr{sum(results$Documents)} documents from \Sexpr{length(results$Sources)} different sources on april 26, 2023, of which \Sexpr{n_articles} are articles and \Sexpr{n_reviews} are reviews. Most of the research is collaborative, only \Sexpr{results$AuSingleAuthoredArt} documents have a single author, the average number of authors per document is \num{\Sexpr{mean(results$nAUperPaper)}} and the most common is \Sexpr{AUperPaper_mode}, distributed as in \autoref{fig:AUperPaper_hustogram}. There is also a considerable number of international collaborations: \num{\Sexpr{results$IntColl}}\% of total publications.
+Table \ref{tab:main_info} shows the main information about the data. The query returned \Sexpr{sum(results$Documents)} documents from \Sexpr{length(results$Sources)} different sources on april 26, 2023, of which \Sexpr{n_articles} are articles and \Sexpr{n_reviews} are reviews. Most of the research is collaborative, only \Sexpr{results$AuSingleAuthoredArt} documents have a single author, the average number of authors per document is \num{\Sexpr{mean(results$nAUperPaper)}} and the most common is \Sexpr{AUperPaper_mode}. There is also a considerable number of international collaborations: \num{\Sexpr{results$IntColl}}\% of total publications.
 
-<<show_main_info_table, warning=FALSE>>=
+<<show_main_info_table, echo=FALSE, warning=FALSE>>=
 <<main_info_table>>
 @
 
-\begin{figure}
-<<AUperPaper_histogram, out.width="100%", fig.align='center', fig.height=5>>=
-h <- hist(results$nAUperPaper, plot = FALSE)
-plot(h, main = NULL, xlab = "Authors per Paper", labels = TRUE, ylim =c(0,1.2*max(h$counts)))
-@
-	\caption{Histogram of authors per paper.}
-	\label{fig:AUperPaper_hustogram}
-\end{figure}
+%\begin{figure}
+%<<AUperPaper_histogram, out.width="100%", fig.align='center', fig.height=5>>=
+%h <- hist(results$nAUperPaper, plot = FALSE)
+%plot(h, main = NULL, xlab = "Authors per Paper", labels = TRUE, ylim =c(0,1.2*max(h$counts)))
+%@
+%	\caption{Histogram of authors per paper.}
+%	\label{fig:AUperPaper_hustogram}
+%\end{figure}
 
-<<eval_missing_data>>=
+<<eval_missing_data, echo=FALSE>>=
 <<missing_data>>
 @
 
-Regarding the quality of the data, Table \ref{tab:missing_data} shows that most of the metadata is complete. Notable exceptions are \Sexpr{misssing_data$mandatoryTags[15,'missing_pct']}\% of author’s keywords (DE), \Sexpr{misssing_data$mandatoryTags[14,'missing_pct']}\% of Web of Science Keywords Plus (ID) and all of Web of Science Categories, not included in the dataset.
+Regarding the quality of the data most of the metadata is complete. Notable exceptions are \Sexpr{misssing_data$mandatoryTags[15,'missing_pct']}\% of author’s keywords (DE), \Sexpr{misssing_data$mandatoryTags[14,'missing_pct']}\% of Web of Science Keywords Plus (ID) and all of Web of Science Categories, not included in the dataset.
 
-<<show_missing_data_table>>=
-<<missing_data_table>>
-@
+% <<show_missing_data_table>>=
+% <<missing_data_table>>
+% @
 
 <<run_slice_2022, include=FALSE>>=
 <<slice_2022>>
 @
 
-The total time span found in the Web of Science platform for SAF production ranges from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to current year (\Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}), as research on sustainable industries increased following a global change in energy policy.
+SAF research in the Web of Science platform spans from \Sexpr{S$AnnualProduction$`Year   `[[1]]} to current year (\Sexpr{S$AnnualProduction$`Year   `[[length(S$AnnualProduction$`Year   `)]]}), as research on sustainable industries increased following a global change in energy policy, discussed in more detail in Section \ref{authors_keywords_textual_analysis}.
 
-<<run_bib_analysis_results_before_AND, results='hide'>>=
+<<run_bib_analysis_results_before_AND, results='hide', echo=FALSE>>=
 <<bib_analysis_results_before_AND>>
 @
 
-Total author count is \Sexpr{results$nAuthors}, before author name disambiguation this number was \Sexpr{results_NOT_ANDED$nAuthors}.
+Total author count is \Sexpr{results$nAuthors}. Before author name disambiguation this number was \Sexpr{results_NOT_ANDED$nAuthors}. This means that there are more distinct authors that share the same names, or homonyms, than synonyms. During manual author name disambiguation one noticed that most of the homonyms are from Chinese researchers. A fact that can be explained partially by China's relevance to this field. It not only is the second most productive country in terms of number of published documents, which increase the chance of homonym occurrence, but also there are many researchers of Chinese origin working in collaboration with the most published country, the United States, further increasing homonym chance.
 
 \subsection{Most relevant sources}
 \label{most_relevant_sources}
 
 The journal with the most publications is Elsevier's Fuel (Table \ref{tab:most_rel_sources})), followed by Energies (MDPI AG) and Renewable \& Sustainable Energy Reviews (Elsevier). From the top ten sources, six are published by Elsevier, and the other four are shared by MDPI AG, Wiley, ACS and Frontiers Media SA. The source that focus the most on SAF is BioFPR from Wiley, 2.91\% of its registered DOIs are on SAF research.
 
-<<show_most_relevant_sources>>=
+<<show_most_relevant_sources, echo=FALSE>>=
 <<most_relevant_sources>>
 @
 
 \subsection{Productivity analysis}
 \label{productivity}
 
-\autoref{fig:annual_scient_prod} shows the annual scientific production on SAF in this period. The average annual growth rate from \Sexpr{S_2022$AnnualProduction$`Year   `[[1]]} to \Sexpr{S_2022$AnnualProduction$`Year   `[[length(S_2022$AnnualProduction$`Year   `)]]} is \Sexpr{S_2022$AnnualGrowthRate}\%, and \Sexpr{S_2012_2022$AnnualGrowthRate}\% from 2012 to 2022. Until around 2007 there was little interest on SAF research, as can ben seen in \autoref{fig:annual_scient_prod}.
+\autoref{fig:annual_scient_prod} shows the annual scientific production on SAF for all documents available in the Web of Science database. The average annual growth rate from \Sexpr{S_2022$AnnualProduction$`Year   `[[1]]} to \Sexpr{S_2022$AnnualProduction$`Year   `[[length(S_2022$AnnualProduction$`Year   `)]]} is \Sexpr{S_2022$AnnualGrowthRate}\%, which increases slightly to \Sexpr{S_2012_2022$AnnualGrowthRate}\% when one looks only to the last decade --- from 2012 to 2022. Until around 2007 there was little interest on the topic. The aviation sector was considered, and still is, one of the most difficult to decarbonize. At the time there was no prospect for SAF implementation in the near future due to high cost and lack of policy. With time, environmental concerns increased, new policies were implemented and research took off. Most of the difficulty is regulatory and logistical. Technologies for the production of alternative fuels such as Fischer-Tropsch synthesis and hydroprocessing of oils and fatty acids were well known at the time. On the regulatory side, the Defense Standard 91-091 of the UK Ministry of Defense \cite{uk_ministry_of_defense_defence_2019} was the first to allow, in 1999, the mixing of synthetic hydrocarbons into conventional jet fuel, thanks to the efforts of Sasol.
+
+In the next sections the productivity analysis was split into three levels: national, institutional and individual. The objective is to get an overview of quantity, by looking at raw publication numbers, as well as quality, by using metrics such as author \emph{h index} in section \ref{authors_productivities}. Lets begin at a national level, move to an overview of the most relevant work by universities and institutes and end the analysis at the most influential and productive authors.
 
 \begin{figure}
-<<plot_annual_scient_prod, results='hide', out.width="100%", fig.align='center', fig.height=6>>=
+<<plot_annual_scient_prod, results='hide', out.width="100%", fig.align='center', fig.height=6, echo=FALSE>>=
 plot(S_2022$AnnualProduction, type = "l", lty = 0)
 lines(S_2022$AnnualProduction, type = "l", lty = 1)
 @
@@ -335,13 +334,15 @@ lines(S_2022$AnnualProduction, type = "l", lty = 1)
 	\label{fig:annual_scient_prod}
 \end{figure}
 
-\subsubsection{Countries}
+\subsubsection{National productivity}
 \label{contries_productivity}
 
-The most productive countries in terms of number of publications, as can be seen in \autoref{fig:most_prod_countries_npub} are the United States and China. When one looks at the ratio of multiple country to single country publications in \autoref{fig:MCP_ratio}, European countries such as the Netherlands and United Kingdom come ahead, while continental countries with large populations --- USA, China and Brazil --- have room to grow in this aspect.
+The surge of SAF publications observed in \autoref{fig:annual_scient_prod} is explained by the international aviation sector's goal of total decarbonization by the middle of the century. Most of the world's nations have agreed to start reducing emissions by the end of the decade \cite{noauthor_factsheet_2023}. Among these, the most productive in terms of number of publications, as can be seen in \autoref{fig:most_prod_countries_npub}, are the United States and China.
+
+When one looks at the ratio of multiple country to single country publications in \autoref{fig:MCP_ratio}, European countries such as the Netherlands and United Kingdom come ahead, while the USA, China and Brazil have room to grow in this aspect. Proportional to economic output and population size, Brazil and India, in particular, have low productivity and could benefit greatly from more international collaborations.
 
 \begin{figure}
-<<show_most_prod_countries, out.width="100%", fig.height=4, fig.align='center', results='hide'>>=
+<<show_most_prod_countries, out.width="100%", fig.height=4, fig.align='center', results='hide', echo=FALSE>>=
 <<barplot_most_prod_countries>>
 @
 	\caption{Most productive countries in terms of number of publications.}
@@ -349,21 +350,32 @@ The most productive countries in terms of number of publications, as can be seen
 \end{figure}
 
 \begin{figure}
-<<show_most_MCP_ratio, out.width="100%", fig.height=4, fig.align='center', results='hide'>>=
+<<show_most_MCP_ratio, out.width="100%", fig.height=4, fig.align='center', results='hide', echo=FALSE>>=
 <<plot_int_collab>>
 @
 	\caption{Multiple country to single country publication ratios.}
 	\label{fig:MCP_ratio}
 \end{figure}
 
-\subsubsection{Authors}
+\subsubsection{Institutional productivity}
+\label{uni_productivity}
+
+The two most productive institutions are Washington State University (WSU) in the USA and Tianjin University in China, with 148 and 91 published documents respectively. Both are well represented by high impact researchers as can be seen in Table \ref{tab:h_index}.
+
+WSU's most cited papers are on the conversion of lignocellulosic biomass to biofuels \cite{zhang_catalytic_2016, wang_biomass-derived_2015, zhang_enhancement_2016}. Other important work has also been published on techno economic analysis and process design for alternative fuels from Firscher-Tropsh Synthesis, hydrotreatment of pyrolysis oils and alcohol-to-jet. As well as repurposing studies of current infrastructure for alternative jet fuel production, like ethanol plants \cite{tanzil_evaluation_2022} and petroleum refineries \cite{tanzil_production_2021}.
+
+Tianjin University's biggest focus is on hydroprocessing, particularly hydrodeoxygenation for the production of high density jet fuel composed of cyclic hydrocarbons \cite{deng_efficient_2016}. High density fuels are desired for volume limited aircraft, mostly military. Civilian aircraft often take off with a partially filled tank, with just enough fuel for a safe flight to its destination, thus it is most often not limited by volume and a fuel with a high volumetric energy density is desired. On the other hand if an aircraft takes off with a full tank, the optimal fuel would be one with a high energy density per unit mass.
+
+Other relevant work by Tianjin University is on pyrolysis kinetic modeling \cite{wang_experimental_2022} and production of olefins, aromatics and hydrocarbons from raw bio-oil and waste cooking oil \cite{ma_co-upgrading_2018}. The aromatics content of such fuels could be an important additive for jet fuel. Further discussion of aromatics role on jet fuel is given in Section \ref{SAF_common}.
+
+\subsubsection{Individual productivity}
 \label{authors_productivities}
 
 % For evaluating an individual authors' contributions to a published set of papers the fractionalized number of authored documents can be used \cite{massimo_aria_biblioshiny_2023} as in Table \ref{tab:most_prod_authors}. This is calculated by taking the sum of reciprocals of the number of coauthors for each author, as in Equation \ref{eq:frac_authors_papers}. By doing this one filters out the effect of authors that have many publications with many authors and reveals individiuals that usually put proportionally greater efforts into their publications, assuming uniform contributions to the papers.
 
-% <<eval_most_prod_authors, include=FALSE>>=
-% <<most_prod_authors>>
-% @
+<<eval_most_prod_authors, include=FALSE, echo=FALSE>>=
+<<most_prod_authors>>
+@
 
 % <<show_most_prod_authors>>=
 % <<most_prod_authors_table>>
@@ -376,67 +388,73 @@ The most productive countries in terms of number of publications, as can be seen
 
 % Where $AU_j$ is the set of documents coauthored by author $j$ and $h$ is a document in $AU_j$.
 
-To characterize the impact of an author's research, the h-index was used. This index was proposed by Dr. J. E. Hirsch in 2005 and is "defined as the number of papers with citation number higher or equal to h" \cite{hirsch_index_2005}. This means that an author with an h-index of 50 has published 50 articles with at least 50 citations each. Four of the top ten authors in order of h index in Table \ref{tab:h_index} are from China, three from the United States and the remaining from Europe.
+To characterize the impact of an author's research, the h-index was used. This index was proposed by Dr. J. E. Hirsch in 2005 and is "defined as the number of papers with citation number higher or equal to h" \cite{hirsch_index_2005}. This means that an author with an h-index of 50 has published 50 articles with at least 50 citations each. Five of the top ten authors in order of h index in Table \ref{tab:h_index} are from China, two from the United States, two from Europe and another from Mexico. The most frequent keywords by these authors reveal that most work on hydroprocessing and pyrolysis, both topics discussed in more detail in the coming sections. Most have been working on the subject since 2015, as is expected by the period's rapid growth in the number of publications. One notable outlier is Dr. Philippe Dagaut. A research director in the French National Centre for Scientific Research (CRNS), Dr. Dagaut have been publishing research on reaction kinetics of fuel oxidation since 1986. His work includes kinetic models for the combustion of alternative fuels \cite{dagaut_kinetics_2007, mze-ahmed_kinetics_2014}. Such data is essential for combustion and emissions simulations, which can be used on aircraft engine computer models and life cycle assessments.
 
-<<eval_h_index, include=FALSE>>=
+<<eval_h_index, include=FALSE, echo=FALSE>>=
 <<h_index>>
 @
 
-<<show_h_index_table>>=
+<<show_h_index_table, echo=FALSE>>=
 <<h_index_table>>
 @
 
-\subsubsection{Universities and research institutes}
-\label{uni_productivity}
+A common keyword on Dr. Dagaut's papers that have recently become a trend topic (see Section \ref{future} and \autoref{fig:trends}) is \textbf{jet-stirred reactor}: a common tool for conducting fuel oxidation experiments. It is a vessel equiped with nozzles capable of providing turbulent jets of fuel that are used to obtain a thorough mix \cite{herbinet_jet-stirred_2013}, so that a condition of uniform concentration may be assumed. This along with conditions of constant residence time, temperature and pressure, greatly simplifies mass and energy balance equations. Its surfacing as a trend topic indicates that SAF technologies are maturing and moving from fundamental research on fuel production itself, by searching for suitable processes and catalysts, to optimization towards fuel composition and emission performance according to current regulations.
 
-\subsection{Collaboration networks}
-\label{collaboration_networks}
+The highest h index author is Dr. Xiangwen Zhang from Tianjin University, which is also the second most productive institution. Dr. Zhang's SAF related papers focus on various topics of chemical reaction engineering and catalyst development, including the production of high density aviation biofuel consisting of cyclic hydrocarbons as well as work on hydroprocessing, pyrolysis and alkylation. High density fuels are a hot topic among the most influential authors due to its interesting properties for volume limited aircraft (see section \ref{uni_productivity}). Dr. Zhang's group includes other top researchers like Dr. Lun Pan and Dr. Ji-Jun Zou, as can be observed in the authors collaboration network in \autoref{fig:authors_network}. The authors' collaboration network also reveals that the top research groups do not collaborate with each other. Fragmentation is certainly an engine for competition between groups, which foments innovation. But in excess it could inhibit sharing of ideas and resources and limit progress.
 
-\subsubsection{Countries}
-\label{countries_collaboration}
+\begin{figure}
+<<show_author_collaboration_network, results='hide', out.width="100%", fig.align='center', fig.height=6, echo=FALSE>>=
+<<author_collaboration_network>>
+@
+	\caption{Authors' collaboration network (biggest 50 nodes).}
+	\label{fig:authors_network}
+\end{figure}
+
+\subsection{International collaboration}
+\label{international_collaboration}
 
 The two central countries on the global collaboration network, shown in \autoref{fig:countries_network}, are the United States (193 total connections) and China (188 total connections). Besides centrality, the strongest collaboration link is also between the two nations with 53 collaborations. All the most connected countries are signatories of CORSIA. In Europe the biggest nodes are the United Kingdom, Germany and the Netherlands.
 
-The central cluster of countries represents the majority of global population, but countries such as India and Brasil have too little connections in proportion to the sizes of their populations. The same is true for overall number and quality\footnote{Assessed by looking at the country of origin in the rank of authors' h index.} of publications. These nations have huge growth potential and with it the aviation sector's relevance increases. If they are to comply with CORSIA, it is on their interests to develop in-country technologies in order to be independent of the USA, China and Europe both from the economic and energy security point of view. Consequently, if they do not become more active in SAF research it is likely that in the near future both nations will be faced with the choice of either not to comply with CORSIA or buy carbon credits and import technology and expertise. 
+The central cluster of countries represents the majority of global population, but countries such as India and Brasil have too little connections in proportion to the sizes of their populations and economies. The same is true for overall number and quality\footnote{Assessed by looking at the country of origin in the rank of authors' h index.} of publications. These nations have huge growth potential and with it the aviation sector's relevance increases. If they are to comply with CORSIA, it is on their interests to develop domestic technologies in order to be independent of the USA, China and Europe both from the economic and energy security point of view. Consequently, if they do not become more active in SAF research it is likely that in the near future both nations will be faced with the choice of either not to comply with CORSIA or buy carbon credits and import technology and expertise. 
 
-\begin{figure*}
-<<show_countries_network, results='hide', out.width="100%", fig.align='center', fig.height=3>>=
+\begin{figure}
+<<show_countries_network, results='hide', out.width="100%", fig.align='center', fig.height=6, echo=FALSE>>=
 <<country_collaboration_network>>
 @
-	\caption{Countries collaboration network. Node and edge sizes are proportional to the number of connections. The biggest edge, between USA and China, corresponds to 53 connections. The biggest node (USA) has 193 connections.}
+	\caption{Countries' collaboration network. Node and edge sizes are proportional to the number of connections. The biggest edge, between USA and China, corresponds to 53 connections. The biggest node (USA) has 193 connections.}
 	\label{fig:countries_network}
-\end{figure*}
+\end{figure}
 
 \subsection{Textual analysis}
 \label{textual_analysis}
 
+The textual analysis was performed based on co-occurrence networks built on terms (highlighted in bold) extracted from titles and keywords. Titles are more generalist and provide an overall idea of the most explored topics, while keywords reveal more in-depth information about the technologies under study.
+
 \subsubsection{Titles co-occurence network}
 \label{titles_textual_analysis}
 
-Extracted title terms co-occurrence network, in \autoref{fig:titles_network}, reveal the most explored subjects and their relations. It has tree main clusters: in blue the one related to \textbf{alternative fuels} (a.f.) and \textbf{sustainable aviation fuels} (s.a.f.). The presence of the \textbf{review} and \textbf{techno-economic analysis} (tec. acon. analysis) nodes suggest little experimental research on the matter by the papers related to this cluster. The \textbf{life} and \textbf{cycle} terms are certainly related to lyfe cycle assessment (LCA), a technique to quantify the environmental impact of a human activity.
+Extracted title terms co-occurrence network, in \autoref{fig:titles_network}, reveal the most explored subjects and their relations. The biggest nodes refer to aviation fuel production. The presence of the \textbf{review} and \textbf{techno-economic analysis} (tec. acon. analysis) nodes suggest a high preponderance of this type of paper. The \textbf{life} and \textbf{cycle} terms are certainly related to lyfe cycle assessment (LCA), a technique to quantify the environmental impact of a human activity.
 
-On green, the cluster of more experimental papers, dealing with catalyst research on the conversion of liquid and solid biomass to \textbf{hydrocarbons}. It targets hydrolysis, \textbf{hydroprocessing} and  \textbf{deoxygenation}, to find catalysts highly active on the \textbf{conversion} of biomass, such as \textbf{palm oil}, into hydrocarbons of a suitable range to produce synthetic fuels.
-
-The red cluster is concerned with the \textbf{characteristics} of the fuels produced once the best catalysts and operating parameters are found. These papers characterize the properties of SAF, how it behaves when fed into engines, appropriate blends with current fossil fuels to ease the transition, as well as evaluations of engine \textbf{emissions} and its impacts on \textbf{air} quality.
-
-\begin{figure*}
-<<show_title_keyword_network, results='hide', out.width="100%", fig.align='center', fig.height=3>>=
+\begin{figure}
+<<show_title_keyword_network, results='hide', out.width="100%", fig.align='center', fig.height=6, echo=FALSE>>=
 <<titles_keywords_co-occurrence_network>>
 @
-	\caption{Titles keywords network.}
+	\caption{Titles keywords co-occurrence network.}
 	\label{fig:titles_network}
-\end{figure*}
+\end{figure}
+
+On the experimental side, there is research on the \textbf{conversion} of liquid and solid biomass to \textbf{hydrocarbons}. It targets hydrolysis, \textbf{hydroprocessing},  \textbf{deoxygenation} and \textbf{pyrolysis} to find catalysts highly active on the conversion of biomass into hydrocarbons of a suitable range to produce synthetic fuels. Another important experimental area is the study of the \textbf{characteristics} of the fuels produced once the best catalysts and operating parameters are found. These papers characterize the properties of SAF, how it behaves when fed into \textbf{engines}, appropriate blends with current fossil \textbf{fuels} to ease the transition, as well as evaluations of engine \textbf{emissions} and \textbf{impacts} on \textbf{air} quality.
 
 \subsubsection{Authors' keywords co-occurence network}
 \label{authors_keywords_textual_analysis}
 
-The authors' keywords co-occurrence network in \autoref{fig:authors_keyword_network}, complements the titles analysis, bringing to the front some more useful information. Again, there are three clusters. On the analysis of the viability of biofuels in red one term catches the eye: \textbf{CORSIA} \cite{noauthor_carbon_nodate}. It stands for Carbon Offsetting and Reduction Scheme for International Aviation. A measure by the International Civil Aviation Organization (ICAO) adopted in 2016 to reduce \ce{CO2} emissions from international flights. The objective is to cap emissions at 85\% of what was emitted in 2019 in the period from 2024 to 2035. Furthermore, there is an ambitious commitment to reach zero emissions by 2050 \cite{noauthor_factsheet_2023}. Offsetting involves the use of sustainable aviation fuels, deployment of renewable energy sources, reforestation or any other activity that reduces \ce{CO2} emissions. By 2027, as can be seen in \autoref{fig:CORSIA}, most of the world will be pursuing CORSIA goals. This is a great opportunity for the SAF sector, as airlines will be searching for clean drop-in fuels in order to be able to grow beyond 2019 levels.
+The authors' keywords co-occurrence network in \autoref{fig:authors_keyword_network}, complements the titles' analysis, bringing to the front some more useful information. There are three clusters. On the analysis of the viability of biofuels in red, one term catches the eye: \textbf{CORSIA} \cite{noauthor_carbon_nodate}. It stands for Carbon Offsetting and Reduction Scheme for International Aviation. A measure by the International Civil Aviation Organization (ICAO) adopted in 2016 to reduce \ce{CO2} emissions from international flights. The objective is to cap emissions at 85\% of what was emitted in 2019 in the period from 2024 to 2035. Furthermore, there is an ambitious commitment to reach zero emissions by 2050 \cite{noauthor_factsheet_2023}. Offsetting involves the use of sustainable aviation fuels, deployment of renewable energy sources, reforestation or any other activity that reduces \ce{CO2} emissions. By 2027, as can be seen in \autoref{fig:CORSIA}, most of the world will be pursuing CORSIA goals. This is a great opportunity for the SAF sector, as airlines will be searching for clean drop-in fuels in order to be able to grow beyond 2019 levels.
 
 \begin{figure*}
-<<show_keyword_network, results='hide', out.width="100%", fig.align='center', fig.height=3>>=
+<<show_keyword_network, results='hide', out.width="100%", fig.align='center', fig.height=4, echo=FALSE>>=
 <<authors_keywords_co-occurrence_network>>
 @
-	\caption{Authors' keywords network.}
+	\caption{Authors' keywords co-occurrence network.}
 	\label{fig:authors_keyword_network}
 \end{figure*}
 
@@ -448,7 +466,7 @@ The authors' keywords co-occurrence network in \autoref{fig:authors_keyword_netw
 
 Still in the red cluster there is a link between \textbf{efficiency}, \textbf{energy} and \textbf{exergy}. Exergy is the maximum amount of useful work that can be extracted from a system when it is brought to thermodynamic equilibrium. In contrast to energy it is not a conservative property. Essentially, exergy is a property that accounts for entropy and allows for the evaluation of system efficiency \cite{bejan_fundamentals_2002}. Exergy analysis can be applied both to SAF production \cite{hao_energy_2021} and aircraft engine performance \cite{balli_turbofan_2021, balli_thermodynamic_2021}.
 
-The green cluster in  \autoref{fig:authors_keyword_network} refers to the core SAF technologies: \textbf{Fischer-Tropsch Synthesis} (FTS), \textbf{Alcohol-to-Jet} (ATJ) and \textbf{deoxygenation} of vegetable oils, which occurs primarily via \textbf{decarboxylation} reaction, commonly referred as DCO2. The deoxygenation of vegetable oils is often done by \textbf{hydroprocessing} of the esters and fatty acids in these oils (HEFA). Most of the biomass \textbf{feedstocks} cannot be used in its raw form in these processes, FTS requires the \textbf{gasification} of materials such as \textbf{lignocellulosic biomass} into syn-gas; ATJ is mostly fed by ethanol produced by fermentation; and deoxygenation uses oils extracted from plants. In contrast is \textbf{pyrolysis} in the blue cluster. Its main advantage is that feedstocks can be introduced into the plant without much treatment, on the other hand pyrolysis reactor product has lower quality and consequently greater refining cost. To make the reader familiar with the terms that emerged in \autoref{fig:authors_keyword_network} an overview of the most relevant SAF production technologies is given below. For more in-depth information, the three most cited reviews on the matter in the data set are a good start \cite{alonso_catalytic_2010, zhang_catalytic_2016, sims_overview_2010}.
+The green cluster in  \autoref{fig:authors_keyword_network} refers to the core SAF technologies: \textbf{Fischer-Tropsch Synthesis} (FTS), \textbf{Alcohol-to-Jet} (ATJ) and \textbf{deoxygenation} of vegetable oils, which occurs primarily via \textbf{decarboxylation} reaction, commonly referred to as DCO2. The deoxygenation of vegetable oils is often done by \textbf{hydroprocessing} of the esters and fatty acids in these oils (HEFA). In general, the biomass \textbf{feedstocks} cannot be used in brute form in these processes. FTS requires the \textbf{gasification} of materials such as \textbf{lignocellulosic biomass} into syn-gas; ATJ is mostly fed by ethanol produced by fermentation; and deoxygenation uses oils extracted from plants. In contrast is \textbf{pyrolysis} in the blue cluster. Its main advantage is that feedstocks can be introduced into the plant without much treatment, on the other hand pyrolysis reactor product has a lower quality and consequently greater refining cost. To make the reader familiar with the terms that emerged in \autoref{fig:authors_keyword_network} an overview of the most relevant SAF production technologies is given below. For more in-depth information, the three most cited reviews in the data set are a good start \cite{alonso_catalytic_2010, zhang_catalytic_2016, sims_overview_2010}.
 
 \subsubsection{Overview of SAF technologies}
 \label{SAF_overview}
@@ -457,14 +475,14 @@ The green cluster in  \autoref{fig:authors_keyword_network} refers to the core S
 \label{SAF_common}
 
 SAF production takes on either starchy (including sugars), triglyceride
-or lignocellulosic feedstocks into biorefineries, similar in nature to petroleum refineries, where the oxygen content is reduced and carbon chains of a wide range are formed, not always in this order, to produce a crude bio-oil that can be refined into various fractions \cite{alonso_catalytic_2010}. It is common the classification of biomass into first generation, sourced from food crops, and second generation, the non-food feedstocks, mostly lignocellulosic \cite{sims_overview_2010}. The fuels produced are usually parafinnic, with low sulfur and aromatics content. Lack of aromatics causes fuel seals to shrink \cite{yakovlieva_experimental_2023}, so at least 8 vol\% aromatics are required on jet fuels \cite{starck_production_2016}. Consequently SAF must be put through dehydrocyclization to increase aromatic concentration. Even if it is aromatized, current regulations require SAF to be blended up to 50\% with conventional jet fuel to ensure proper fuel quality \cite{enright_d7566_2023}.
+or lignocellulosic feedstocks into biorefineries, similar in nature to petroleum refineries, where the oxygen content is reduced and carbon chains of a wide range are formed, not always in this order, to produce a crude bio-oil that can be refined into various fractions \cite{alonso_catalytic_2010}. It is common the classification of biomass into first generation, sourced from food crops, and second generation, of non-food feedstocks, mostly lignocellulosic \cite{sims_overview_2010}. The fuels produced are usually parafinnic, with low sulfur and aromatics content. Lack of aromatics causes fuel seals to shrink \cite{yakovlieva_experimental_2023}, so at least 8 vol\% aromatics are required on jet fuels \cite{starck_production_2016}. Consequently SAF must be put through dehydrocyclization to increase aromatic concentration. Even if it is aromatized, current regulations require SAF to be blended up to 50\% with conventional jet fuel to ensure proper fuel quality \cite{enright_d7566_2023}.
 
 \paragraph{Hydroprocessing of esters and fatty acids (HEFA)}
 \label{HEFA}
 
 Reacts esters and fatty acids with hydrogen to produce hydrocarbons \cite{monteiro_production_2022}. These reactions include deoxygenation, which increases the energy content; cracking, to break apart excessively long molecules, and isomerization, which reorganizes the carbon chains improving physical characteristics such as cold flow properties \cite{starck_production_2016}, particularly important for aircraft operated at the low temperatures found at high altitudes.
 
-Currently, it is the largest industrial source of bio-oil, predominantly bio diesel. Fuels obtained by this route have a low sulfur content and generate less soot than fossil counterparts, but the selectivity to aviation kerosene is low because vegetable oils have carbon chains similar in length to what is encountered in diesel fuel \cite{doliente_bio-aviation_2020}.
+Currently, it is the largest industrial source of bio-oil, predominantly biodiesel. Fuels obtained by this route have a low sulfur content and generate less soot than fossil counterparts, but the selectivity to aviation kerosene is low because vegetable oils have carbon chains similar in length to what is encountered in diesel fuel \cite{doliente_bio-aviation_2020}.
 
 \paragraph{Fischer-Tropsch synthesis (FTS)}
 \label{fts}
@@ -484,13 +502,35 @@ The biomass, often cellulosic, is thermally decomposed into bio-char, biogas and
 \subsection{Citation analysis}
 \label{citation_analysis}
 
+Important papers were divided in two categories. The most locally cited papers, that is, the papers with the most citations within the dataset; and historical papers, which are less cited in recent literature, but contributed greatly to early research. In both cases, the predominant types of papers are reviews and life cycle assessments.
+
 \subsubsection{Most locally cited papers}
 \label{most_locally_cited}
+
+<<run_slice_2016_2020, echo=FALSE>>=
+<<slice_2016_2020>>
+@
+
+When one begins to work on a new project or research, literature reviews are a great resource to get a quick introduction to a subject. For this reason the most locally cited papers, listed in Table \ref{tab:most_locally_cited}, are reviews published between 2016 and 2020. The period has \Sexpr{100*results_2016_2020$Articles/results$Articles}\% of the total number of documents and \Sexpr{100*reviews_2016_2020/results_2016_2020$Articles}\% are reviews. The most recent timespan, from 2021 to 2023, have a similar proportion of reviews (\Sexpr{100*reviews_2020_2023/results_2020_2023$Articles}\%) but not yet enough time to be read and cited in the same numbers. In general, authors tend to favor recent documents as references, and the interval of relevance of a document shifts along with new publications. Indeed, \autoref{fig:review_citation_vs_age} shows a tendency for recent papers (aged 10 years or less) to reach a maximum rate of citations around age five and then drop in relevance. Very few pass the test of time and keep a high citation rate as they age.
+
+Many issues discussed by the papers in Table \ref{tab:most_locally_cited} were already covered in the previous discussion, other are extensions and improvements of previous pioneering work, which will be discussed in the next section. After that, attention is shifted to the future, by looking at recent trends. 
+
+<<show_most_locally_cited_papers, echo=FALSE>>=
+<<most_locally_cited_papers>>
+@
+
+\begin{figure}
+<<show_review_citations_vs_age, results='hide', out.width="100%", fig.align='center', fig.height=6, echo=FALSE>>=
+<<plot_review_age_vs_citation>>
+@
+	\caption{SAF research papers total citations versus age plot, separated by articles and reviews.}
+	\label{fig:review_citation_vs_age}
+\end{figure}
 
 \subsubsection{Historically influential references: References publication year spectrocopy}
 \label{rpys}
 
-Historical references can be identified by references publication year spectroscopy, in \autoref{fig:rpys}, on the peaks of the full line, which shows the differences in total number of citations per year and the median number of citations of past five years. This difference highlights years with an unusually high citation count. The five most historical years for SAF references are, in order of importance, 2010, 2011, 2009, 2008 and 2007. A brief summary of the three most relevant papers for each of these years is presented below, the top cited historical papers are listed in Table \ref{tab:historical_papers}.
+It is difficult to identify early influential papers by looking at the number of citations alone. But if one looks at the deviation in the number of citations from the five year median, historical years, and consequently the most cited papers of such years, can be identified. This method is called references publication year spectroscopy \cite{marx_detecting_2014}, or RPYS, and the graph that it produces, presented in \autoref{fig:rpys}, resembles spectra that would be obtained, for example, from measurements of light absorption. The peaks of the solid line highlight years with an unusually high citation count. The five most historical years for SAF references are, in order of importance, 2010, 2011, 2009, 2008 and 2007. A brief summary of the three most relevant papers for each of these years is presented below, the top cited historical papers are listed in Table \ref{tab:historical_papers}.
 
 % Please add the following required packages to your document preamble:
 % \usepackage{graphicx}
@@ -501,7 +541,7 @@ Historical references can be identified by references publication year spectrosc
 \end{table*}
 
 \begin{figure}
-<<show_rpys, results='hide', out.width="100%", fig.align='center', fig.height=6>>=
+<<show_rpys, results='hide', out.width="100%", fig.align='center', fig.height=6, echo=FALSE>>=
 <<reference_publication_year_spectrocopy>>
 @
 	\caption{References publication year spectroscopy.}
@@ -511,27 +551,27 @@ Historical references can be identified by references publication year spectrosc
 \paragraph{2010}
 \label{2010}
 
-A paper by Shonnard, Williams and Kalnes \cite{shonnard_camelina-derived_2010} (58 LC\footnote{Local Citations: citations mentioned in the papers of the dataset. As oposed to global citations, which are all the citations the paper ever received.}) on camelina derived jet-fuel and diesel via hydrotreatment (HEFA) presents a life cycle analysis of fuels from camelina cultivated on marginal lands and on lands used for food crops in the periods between harvests. Camelina is a weed native to Europe and well adapted to temperate climates with a short season crop. This route can have green house gas savings of up to 80\%. The biggest contributions to emissions are from feedstock production transportation and processing. During cultivation emissions are from farm equipment run on fossil diesel and \ce{NO2} from fertilizer. Hydroprocessing requires large amounts of hydrogen sourced from steam reforming of natural gas and transportation of feedstock in large volumes and distances is also a problem.
+A paper by Shonnard, Williams and Kalnes \cite{shonnard_camelina-derived_2010} (58 LC\footnote{Local Citations: citations mentioned within the papers of the dataset. As opposed to global citations, which are all the citations the paper ever received.}) on camelina derived jet-fuel and diesel via hydrotreatment (HEFA) presents a life cycle analysis of fuels from camelina cultivated on marginal lands and on lands used for food crops in the periods between harvests. Camelina is a weed native to Europe and well adapted to temperate climates with a short season crop. This route can have green house gas savings of up to 80\%. The biggest contributions to emissions are from feedstock production, transportation and processing. During cultivation, emissions are from farm equipment run on fossil diesel and \ce{NO2} from fertilizer. Hydroprocessing requires large amounts of hydrogen sourced from steam reforming of natural gas and transportation of large volumes of feedstock through great distances is also a problem.
 
-On the topic of climate science, Lee et al. \cite{lee_transport_2010} (42 LC) assess that the impact of aviation on the atmosphere and climate is on the direction of warming caused by \ce{CO2}, soot, water and \ce{NOx}.
+On the topic of climate science, Lee et al. \cite{lee_transport_2010} (42 LC) assess that the impact of aviation on the atmosphere is on the direction of warming caused by \ce{CO2}, soot, water and \ce{NOx}.
 
-Rye, Blakey and Wilson \cite{rye_sustainability_2010} (42 LC) present in a review a perspective not only from the point of view of sustainability but also from supply security. Even if a fuel is not sustainable it might still be valuable if it can replace current jet fuel in an oil shortage scenario. Secondary impacts such as those from land usage and coal or natural gas feedstocks to supplement production must be included in the emissions assessment. The two processes evaluated in the review are Fischer-Tropsch and hydroprocessing. Fischer-Tropsch is more suitable for supply diversification, because the source of the syn-gas does not matter from the production point of view. Hydroprocessing tends to less emissions when operated with sustainable feedstock.
+Rye, Blakey and Wilson \cite{rye_sustainability_2010} (42 LC) present in a review a perspective not only from the point of view of sustainability but also from supply security. Even if a fuel is not sustainable it might still be valuable if it can replace current jet fuel in an oil shortage scenario. Often neglected secondary impacts such as those from land usage and coal or natural gas feedstocks to supplement production must be included in the emissions assessment. The two processes evaluated in the review are Fischer-Tropsch Synthesis (FTS) and hydroprocessing. FTS is more suitable for supply diversification, because the syn-gas source does not matter from the production point of view. Hydroprocessing emits less when operated with sustainable feedstock.
 
 \paragraph{2011}
 \label{2011}
 
-Another review by Blakey, Rye and Wilson \cite{blakey_aviation_2011} from the University of Sheffield in the UK, now on "Aviation gas turbine alternative fuels" is the most cited of the historical references with 111 local citations. It gives a thorough evaluation of what the authors call aviation alternative fuels. The choice of words is wise, using a term such as sustainable aviation fuels may not always be appropriate. Although alternative aviation fuels combustion is demonstrably cleaner than conventional jet fuel in almost every case --- from HEFA, FTS and ATJ fuels; the whole life cycle of land usage for feedstock production, fuel processing and transportation must be evaluated.  It is not yet known if all the proposed alternatives are indeed sustainable. Clearing of natural \ce{CO2} fixing land for fuel production, such as jungles and forests, could have the same if not worse environmental impact than fossil kerosene. Natural forested land has not only a direct impact on \ce{CO2} balance, but also on other factors such as rain cycles \cite{pielke_overview_2007} and the availability of land for every other form of life with which we share the planet and may depend on for our survival, even if is hard to quantify their relationship to mankind. These effects are sometimes referred in the literature as land use change impact, or LUC. In conclusion, as stated by Blakey, Rye and Wilson \cite{blakey_aviation_2011}: "alternative fuels should only be sourced from marginal land" and, one adds, from industrial and agricultural biomass residues.
+Another review by Blakey, Rye and Wilson \cite{blakey_aviation_2011}, now on 'Aviation gas turbine alternative fuels' is the most cited of the historical references with 111 local citations. It gives a thorough evaluation of what the authors call aviation alternative fuels. The choice of words is wise, using a term such as sustainable aviation fuels may not always be appropriate. Although alternative aviation fuels combustion is demonstrably cleaner than conventional jet fuel in almost every case --- from HEFA, FTS and ATJ fuels; the whole life cycle of land usage for feedstock production, fuel processing and transportation must be evaluated.  It is not yet known if all the proposed alternatives are indeed sustainable. Clearing of natural \ce{CO2} fixing land for fuel production, such as jungles and forests, could have the same if not worse environmental impact than fossil kerosene. Natural forested land has not only a direct impact on \ce{CO2} balance, but also on other factors such as rain cycles \cite{pielke_overview_2007} and the availability of land for every other form of life with which we share the planet and may depend on for our survival, even if is hard to quantify their relationship to mankind. These effects are sometimes referred in the literature as land use change impact, or LUC. In conclusion, as stated by Blakey, Rye and Wilson \cite{blakey_aviation_2011}: "alternative fuels should only be sourced from marginal land" and, one adds, from industrial and agricultural biomass residues.
 
 Notice that fatty acid methyl esters (FAME) is seldom mentioned as a possibility for aviation. Their feedstocks have inappropriate chain lenghts as mentioned above, but also trace amounts of metals are carried from the feedstock to the final product, which is not permitted by current regulations due to negative effects on engines \cite{blakey_aviation_2011}. Although FAME and HEFA fuels are often sourced from the same feedstocks, they are not the same. FAME is produced by transesterification of fatty acids from vegetable oils with alcohols using a base as a catalyst. HEFA fuels are hydroprocessed vegetable oils, that is, they are reacted with hydrogen in the presence of a catalyst, which removes heteroatoms such as sulfur, nitrogen, oxygen and metals via hydrogenation and hydrogenolysis. More detailed information about hydroprocessing is presented by refs. \cite{ancheyta_hydroprocessing_2005, sonthalia_hydroprocessed_2019}.
 
-A life cycle assessment by Agustinata et al. \cite{agusdinata_life_2011} (60 LC) for the production of biojet fuel in the United States concluded, at the time of publication, that the rate of adoption would not be sufficient to meet the emissions target.
+Still in 2011, an importany life cycle assessment by Agustinata et al. \cite{agusdinata_life_2011} (60 LC) was published. It concluded that the production of biojet fuel in the United States, at the rate of adoption at the time, would not be sufficient to meet the emissions target.
 
-In tandem with life cycle assessments there is another essential line of work on the properties of alternative aviation fuels (AJF). Industrial and pilot scale alternative jet fuels produced from fossil and bio-sourced carbon produced by Sasol, Shell, Rentech, UOP, and Syntroleum
-Corporation were studied by Corporan et al. \cite{corporan_chemical_2011} (52 LC). AJFs heve better combustion than conventional JP-8 fuel --- less soot and \ce{CO}. But need to improve on three essential areas: 
+In tandem with life cycle assessments there is another essential line of work on the properties of alternative aviation fuels. Industrial and pilot scale alternative jet fuels (AJF) produced from fossil and bio-sourced carbon produced by Sasol, Shell, Rentech, UOP, and Syntroleum
+Corporation were studied by Corporan et al. \cite{corporan_chemical_2011} (52 LC). AJFs heve better combustion than conventional JP-8 fuel, resulting in less soot and \ce{CO} in the exhaust. Nevertheless they need to improve on three essential areas: 
 
 {\enumerate{
-  \item Lubricity\footnote{The capability of a compound to reduce friction and wear.} is poor due to the parafinic nature of the fuels and the hydrotreament to remove heteroatoms. Lubricity is improved in fuels that contain heteroatoms that increase polarity like oxygen, nitrogen and sulfur, as well as by the presence of double bonds \cite{knothe_lubricity_2005};
-  \item The low aromatics content cause insufficient seal swell. In the short term aromatics from petroleum can be added. For the long term fuel seals can be substituted by materials that perform better with ATJs, like nitrile O-rings instead of elastomer \cite{corporan_chemical_2011};
+  \item Lubricity\footnote{The capability of a compound to reduce friction and wear.} is poor due to the parafinic nature of the fuels and the hydrotreament to remove heteroatoms. Lubricity is improved in fuels that contain heteroatoms that increase polarity, like oxygen, nitrogen and sulfur, as well as by the presence of double bonds \cite{knothe_lubricity_2005};
+  \item The low aromatics content cause insufficient seal swell. In the short term aromatics from petroleum can be added. For the long term fuel seals can be substituted by materials that perform better with AJFs, like nitrile instead of elastomer seals \cite{corporan_chemical_2011};
   \item Density and volumetric energy content need to improve.
 
 }}
@@ -544,26 +584,52 @@ One of the major concerns of SAF researchers is on fuel emissions. For this reas
 \paragraph{2008}
 \label{2008}
 
-Searchinger et al. \cite{searchinger_use_2008} warned about thinking that a fuel is sustainable because its feedstock captures atmospheric carbon. When biofuel prices increase farmers clear land to increase crop production, which increases emissions. Crops like corn for ethanol production can double emissions, so great care must be put into the choice of feedstock.
+Searchinger et al. \cite{searchinger_use_2008} was one of the first to warn about thinking that a fuel is sustainable because its feedstock captures atmospheric carbon. When biofuel prices increase, farmers clear land to expand crop production, which increases emissions. Crops like corn for ethanol production can double emissions, so the feedstock choice must be considered with great care.
 
 \paragraph{2007}
-\label{2007} The utilization of oil refineries for biofuel production was being considered \cite{huber_synergies_2007, huber_processing_2007}. The feedstock that would require minimal modifications for refinery conversion is vegetable oil. The problems for the production of aviation biofuels are the same mentioned above, supply scarceness, food security and yield. For lignocellulosic biomass, pyrolysis or hydrolysis are two options to produce bio-oil for hydrotreatment. It is available in greater quantities but the crude bio-oil is often of poor quality, which increases refining costs.
+\label{2007} The utilization of oil refineries for biofuel production was being considered \cite{huber_synergies_2007, huber_processing_2007}. The feedstock that would require minimal modifications for refinery conversion is vegetable oil. Problems with the production of aviation biofuels are the same as the ones mentioned above: supply scarceness, food security and yield. For lignocellulosic biomass, pyrolysis or hydrolysis are two options to produce bio-oil for hydrotreatment. It is available in greater quantities but the crude bio-oil is often of poor quality, which increases refining costs.
 
 \section{The future}
 \label{future}
 
-A timeline of recent author's keywords and their time span, in \autoref{fig:trends}, gives hints to what is expected of SAF research in the coming years. Work on lignocellulosic biomass continues, it is the most difficult to process feedstock but has the greatest potential in terms of volume of production. HEFA, FTS, pyrolysis and HTL have been established as the core technologies for now. But there are great challenges ahead, proofs of concept are plentiful but not yet efficient enough for large scale production, and there are doubts on the availability of land to produce all the carbon necessary to meet current CORSIA goals. It is estimated that to provide the commercial aviation sector with a 50/50 blend of SAF \footnote{sourced from Jatropa oil} to conventional jet fuel would require 6\% of the world's arable land, just to meet the demands of a sector responsible for 2.6\% of \ce{CO2} emissions \cite{rye_sustainability_2010}, an unfeasible approach. Thus the upstream processes need to improve, the example of land usage given above is based on Jatropa oil alone, but there is more carbon in lignocellulosic biomass, its supply potential is more than four times larger than oil producing feedstock \cite{agusdinata_life_2011}. Efficiency improvements could involve hybrid processes, combining the strengths and weaknesses of these technologies. Surplus hydrogen from Firscher-Tropsch synthesis could be directed to hydroprocessing; the high diesel cut from the vegetable oils can be fueled into the transportation of lignocellulosic biomass; sugar cane bagasse from ethanol used in alcohol-to-jet can be gasified for FTS. As a matter of fact the future biorefinery should be as versatile as possible and capable to integrate all above mentioned technologies to increase efficiency. Indeed there are initiatives in Brazil at the moment for the implementation of pilot scale plants to utilize the ethanol industry residues to produce SAF, the data obtained will be a next step in the direction of energy security and emission reduction, besides the quality of life improvements around airports burning cleaner fuels.
+A timeline of recent author's keywords and their time span, in \autoref{fig:trends}, gives hints to what is expected of SAF research in the coming years. Work on lignocellulosic biomass continues, it is the most problematic feedstock but has the greatest potential volume of production. HEFA, FTS, pyrolysis and HTL have been established as the core technologies for now. Still, there are great challenges ahead. Proofs of concept are plentiful but not yet efficient enough for large scale production. There are doubts on the availability of land to produce all the carbon necessary to meet current CORSIA goals. It is estimated that to provide the commercial aviation sector with a 50/50 blend of SAF \footnote{sourced from Jatropa oil} to conventional jet fuel would require 6\% of the world's arable land, just to meet the demands of a sector responsible for 2.6\% of \ce{CO2} emissions \cite{rye_sustainability_2010}, an unfeasible approach. Thus the upstream processes need to improve, the example of land usage given above is based on Jatropa oil alone, but there is more carbon in lignocellulosic biomass, its supply potential is more than four times larger than oil producing feedstock \cite{agusdinata_life_2011}. Efficiency improvements could involve hybrid processes, combining the strengths and weaknesses of the technologies. Surplus hydrogen from Firscher-Tropsch synthesis could be directed to hydroprocessing; the high diesel cut from the vegetable oils can be fueled into the transportation of lignocellulosic biomass; sugar cane bagasse from ethanol used in alcohol-to-jet can be gasified for FTS. As a matter of fact the future biorefinery should be as versatile as possible and capable to integrate all above mentioned technologies to increase efficiency. Indeed there are initiatives in Brazil at the moment for the implementation of pilot scale plants to utilize the ethanol industry residues to produce SAF, the data obtained will be a next step in the direction of energy security and emission reduction, besides the quality of life improvements around airports burning cleaner fuels.
+
+As mentioned in Section \ref{authors_productivities}, one indication that SAF research is maturing is the increasing work on fuel properties, by applying tools such as jet-stirred reactors. Such experimental effort provides data on fuel combustion for the development of kinetic models to be used on simulations of aircraft engines prior to flight tests. Concerning \textbf{aircraft design}, there are nine papers with this keyword. A good way to analyse specific keywords or any other interesting term, is to look only at the subset of the data that mentions it. For the aircraft design term, its keyword network in \autoref{fig:aircraft_design}, reveals promising aircraft technologies in an early stage of development: hydrogen fueled aircraft and new engine and air frame designs for low noise and fuel efficiency. 
+
+<<aircraft_design_filter_show, echo=FALSE>>=
+<<aircraft_design_filter>>
+@
 
 \begin{figure}
-<<show_trends, results='hide', out.width="100%", fig.align='center', fig.height=6>>=
+<<show_trends, results='hide', out.width="100%", fig.align='center', fig.height=6, echo=FALSE>>=
 <<trend_topics>>
 @
 	\caption{Timeline of most mentioned topics from 2017 to 2022. The bars represent the timespan of each term, the location of the circle the year and its size the frequencies.}
 	\label{fig:trends}
 \end{figure}
 
+\begin{figure}
+<<show_aircraft_design_keyword_network, results='hide', out.width="100%", fig.align='center', fig.height=6, echo=FALSE>>=
+<<aircraft_design_filter_results>>
+<<aircraft_design_keyword_network>>
+@
+	\caption{Keyword network of the subset of papers on aircraft design.}
+	\label{fig:aircraft_design}
+\end{figure}
+
 \section{Conclusion}
 \label{conclusion}
+
+Sustainable aviation fuel research is taking off. Recent international policies and agreements provided airline companies with incentives to decarbonization. This paper provided a bibliometric overview of the most relevant SAF research, its good and bad qualities. Basic SAF production technologies are well established in the literature. On the side of chemical processing strategies, it is perfectly possible to produce synthetic aviation fuels of a higher quality than conventional jet fuel. The issues emerge when the application of such technologies is considered in  large scales. Then its feasibility is put in question. Laboratory scale research alone is not capable of providing all answers. Industrial regional implementation of synthetic aviation fuels is emerging to provide proofs of concept for this first step of the transition from conventional jet fuel to drop-in alternative, synthetic, hopefully sustainable, aviation fuels.
+
+\section{Acknowledgments}
+\label{acknowledgments}
+
+The authors would like to thank the Brazilian funding agencies CAPES-CNPQ and FINEP for their support of scientific and technological development.
+
+\section{Disclaimer}
+\label{disclaimer}
+The authors are currently involved in a project for the implementation of a pilot scale SAF production plant in the state of Paraná, Brazil.
 
 %% The Appendices part is started with the command \appendix;
 %% appendix sections are then done as normal sections
@@ -575,7 +641,7 @@ A timeline of recent author's keywords and their time span, in \autoref{fig:tren
 %% If you have bibdatabase file and want bibtex to generate the
 %% bibitems, please use
 %%
-\bibliographystyle{elsarticle-num} 
+\bibliographystyle{elsarticle-harv} 
 \bibliography{bibliography.bib}
 
 %% else use the following coding to input the bibitems directly in the

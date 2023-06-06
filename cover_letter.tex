@@ -1,0 +1,113 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plain Cover Letter
+% LaTeX Template
+% Version 2.0 (February 14, 2023)
+%
+% This template originates from:
+% https://www.LaTeXTemplates.com
+%
+% Author:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[12pt]{letter} % Default font size of the document, can use values of 10pt, 11pt or 12pt, but you may need to adjust margins if reducing font size
+
+%----------------------------------------------------------------------------------------
+%	FONTS
+%----------------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+
+\usepackage{times} % Use the URW Schoolbook L font, similar to New Century Schoolbook
+
+%----------------------------------------------------------------------------------------
+%	MARGINS
+%----------------------------------------------------------------------------------------
+
+\usepackage{geometry} % Required for adjusting page dimensions and margins
+
+\geometry{
+	paper=a4paper, % Paper size, change to letterpaper for US letter size
+	top=2cm, % Top margin
+	bottom=2.5cm, % Bottom margin
+	left=3.25cm, % Left margin
+	right=3.25cm, % Right margin
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	ADDRESSEE
+%----------------------------------------------------------------------------------------
+
+\date{\raggedright\today} % Left-aligned date of the letter, use \today for the current date
+
+\begin{letter}{
+	% Name and address of the person to whom the letter is being sent
+	Dr. Aoife Foley \\
+	Editor-in-Chief \\
+	Renewable and Sustainable Energy Reviews \\
+	Queen's University Belfast \\
+	Belfast, United Kingdom \\
+	%North Hollywood, L.A. 91607
+}
+
+%----------------------------------------------------------------------------------------
+%	YOUR NAME & ADDRESS
+%----------------------------------------------------------------------------------------
+
+\begin{center}
+	\large\bfseries % Font size and styling
+	Rafael Belo Duarte \\ % Your name
+	5790 Colombo Avenue, Building D90, Lab. 1B \\ % Your address and phone number
+	Maringá, Paraná, Brazil, 87020-900 \\
+	duarterafaelbelo@gmail.com
+\end{center}
+
+\vspace{1cm} % Vertical whitespace
+
+\signature{Rafael Belo Duarte.} % Your name for the signature at the bottom
+
+%----------------------------------------------------------------------------------------
+%	COVER LETTER CONTENT
+%----------------------------------------------------------------------------------------
+
+\opening{Dear Editor in Chief,}
+
+We wish to submit our manuscript entitled “Historical perspective on sustainable aviation fuels: a bibliometric analysis” for consideration of publication in the journal of Renewable and Sustainable Energy Reviews. The statistical bibliometric analysis methodology presented in the paper have been a valuable tool in our day-to-day research to get an overview of a new subject and study its history and trends. The methodology is quick to apply and can be used to orient a classical literature review. For this reason we belive this paper would be of interest to your readers. We also provide all the code used on the analysis under a free software licence, so it can be applied and modified by other researchers.
+
+The motivation for the analysis is our recent involvement in the implementation of a pilot scale SAF production plant. To get a broad view on the matter, the complete dataset of literature records related to sustainable aviation fuels (SAF) was colected from the Web of Science database and analysed. The results show a recent surge in SAF research, linked to deadlines on emission caps by organizations such as the International Civil Aviation Organization.
+
+We begin with a productivity analysis, to identify the most productive countries, institutes and researchers and their most relevant work. Then attention is shifted to a textual analysis. Terms from the entire bibliograpic dataset are gathered together and studied accordig to their frequencies and relations. This allows one to identify, without having to read all of 1714 papers, the most relenvant topics. To make the reader familiar with such topics, a brief review of SAF technologies is given. The paper ends with a trend topic analysis, which indicates great challenges ahead. The sustainability of this type of fuel has been put into question in the past due to lack of data, so efficiency must increase and larger scale proofs of concept are required.
+
+
+This paper has not been submitted to publication nor has been published elsewhere.
+
+Please address all correspondence concerning this manuscript to me at \\
+duarterafaelbelo@gmail.com
+
+We thank you for your consideration.
+
+\closing{Sincerely,}
+
+%\ps{P.S. An additional note or description.} % A postscript line for additional information or descriptions
+
+%\encl{Curriculum vitae, employment form} % List your enclosed documents here, comment this line for no enclosures
+
+%----------------------------------------------------------------------------------------
+
+\end{letter}
+
+\end{document}
